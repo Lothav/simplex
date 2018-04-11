@@ -2,10 +2,12 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <regex.h>
+#include <string.h>
 
 struct Fraction {
-    int numerator;
-    int denominator;
+    long numerator;
+    long denominator;
 };
 
 struct Matrix {
@@ -14,11 +16,64 @@ struct Matrix {
     long int columns;
 };
 
+char* regexRow(char* src)
+{
+    int res, len;
+    char *result = malloc(BUFSIZ), err_buf[BUFSIZ], *aux = src;
+
+    const char* pattern = "\\[((\\-*[0-9]+[\\,\\ ]*)+)\\]";
+
+    regex_t preg;
+    regmatch_t pmatch[10];
+
+    if( (res = regcomp(&preg, pattern, REG_EXTENDED)) != 0)
+    {
+        regerror(res, &preg, err_buf, BUFSIZ);
+        printf("regcomp() error: %s\n", err_buf);
+        exit(res);
+    }
+
+    long offset = 0;
+    while(1)
+    {
+        aux += offset;
+        res = regexec(&preg, aux, 10, pmatch, REG_NOTBOL);
+        if(res == REG_NOMATCH) break;
+
+        offset = pmatch[0].rm_eo - pmatch[0].rm_so;
+
+        len = pmatch[1].rm_eo - pmatch[1].rm_so;
+        memcpy(result, aux + pmatch[1].rm_so, (size_t)len);
+        result[len] = '\0';
+
+        printf("%s\n", result);
+    }
+    regfree(&preg);
+
+    return result;
+}
+
+void setRow(struct Fraction *row, char *line, unsigned int size)
+{
+    while (size)
+    {
+        if ((*line == '-' && isdigit(*(line+1))) || isdigit(*line)) {
+            long val = strtol(line, &line, 10);
+            row->numerator = val;
+            row->denominator = 1;
+            size--;
+            printf("%ld\n", val);
+        } else {
+            line++;
+        }
+    }
+}
+
 void buildMatrixFromFile(FILE* input)
 {
     struct Matrix* matrix = malloc(sizeof(struct Matrix));
 
-    char aux[20], *pEnd, *pEnd2;
+    char aux[20], *pEnd;
 
     fgets(aux, 20, input);
     matrix->lines = strtol(aux, &pEnd, 10);
@@ -35,23 +90,13 @@ void buildMatrixFromFile(FILE* input)
 
     fgets(line, (int)line_size, input);
 
+    char *rows = regexRow(line);
+
     int i = 0;
-    long int cell = 0;
     for (i = 0; i < matrix->lines; i++)
     {
         matrix->cells[i] = malloc(matrix->columns * sizeof(struct Fraction));
-
-        char *p = line;
-        while (*p)
-        {
-            if (isdigit(*p)) {
-                long val = strtol(p, &p, 10);
-                printf("%ld\n", val);
-            } else {
-                p++;
-            }
-        }
-
+        setRow(matrix->cells[i], line, matrix->columns);
     }
 
 }
