@@ -16,10 +16,13 @@ struct Matrix {
     long int columns;
 };
 
-char* regexRow(char* src)
+char** regexRow(char* src, unsigned int row_size)
 {
     int res, len;
-    char *result = malloc(BUFSIZ), err_buf[BUFSIZ], *aux = src;
+    char *result = malloc(BUFSIZ),
+         **return_value = malloc(row_size * sizeof(char *)),
+         err_buf[BUFSIZ],
+         *aux = src;
 
     const char* pattern = "\\[((\\-*[0-9]+[\\,\\ ]*)+)\\]";
 
@@ -34,7 +37,8 @@ char* regexRow(char* src)
     }
 
     long offset = 0;
-    while(1)
+    int i;
+    for(i = 0; i < row_size; i++)
     {
         aux += offset;
         res = regexec(&preg, aux, 10, pmatch, REG_NOTBOL);
@@ -46,11 +50,15 @@ char* regexRow(char* src)
         memcpy(result, aux + pmatch[1].rm_so, (size_t)len);
         result[len] = '\0';
 
+        return_value[i] = malloc((size_t)len + 1);
+        memcpy(return_value, result, (size_t)len);
         printf("%s\n", result);
     }
-    regfree(&preg);
 
-    return result;
+    regfree(&preg);
+    free(result);
+
+    return return_value;
 }
 
 void setRow(struct Fraction *row, char *line, unsigned int size)
