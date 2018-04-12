@@ -42,18 +42,18 @@ char** regexRow(char* row_src, long row_size, const char* row_pattern)
     return return_value;
 }
 
-void setRow(struct Fraction *row, char *line, unsigned long size)
+void setRowWithString(struct Fraction *row, char *string, unsigned long row_size)
 {
     int index = 0;
-    while (index < size)
+    while (index < row_size)
     {
-        if ((*line == '-' && isdigit(*(line+1))) || isdigit(*line)) {
-            long val = strtol(line, &line, 10);
+        if ((*string == '-' && isdigit(*(string+1))) || isdigit(*string)) {
+            long val = strtol(string, &string, 10);
             row[index].numerator = val;
             row[index].denominator = 1;
             index++;
         } else {
-            line++;
+            string++;
         }
     }
 }
@@ -85,7 +85,7 @@ struct Matrix* buildMatrixFromFile(FILE* input)
     for (i = 0; i < matrix->lines; i++)
     {
         matrix->cells[i] = malloc(matrix->columns * sizeof(struct Fraction));
-        setRow(matrix->cells[i], rows[i], matrix->columns);
+        setRowWithString(matrix->cells[i], rows[i], matrix->columns);
     }
 
     return matrix;
