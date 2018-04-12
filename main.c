@@ -12,11 +12,11 @@ struct Fraction {
 
 struct Matrix {
     struct Fraction **cells;
-    long int lines;
-    long int columns;
+    unsigned long int lines;
+    unsigned long int columns;
 };
 
-char** regexRow(char* src, unsigned int row_size)
+char** regexRow(char* src, long row_size)
 {
     int res, len;
     char *result = malloc(BUFSIZ),
@@ -47,12 +47,11 @@ char** regexRow(char* src, unsigned int row_size)
         offset = pmatch[0].rm_eo - pmatch[0].rm_so;
 
         len = pmatch[1].rm_eo - pmatch[1].rm_so;
-        memcpy(result, aux + pmatch[1].rm_so, (size_t)len);
-        result[len] = '\0';
-
         return_value[i] = malloc((size_t)len + 1);
-        memcpy(return_value, result, (size_t)len);
-        printf("%s\n", result);
+        memcpy(return_value[i], aux + pmatch[1].rm_so, (size_t)len);
+        return_value[i][len] = '\0';
+
+        printf("%s\n", return_value[i]);
     }
 
     regfree(&preg);
@@ -61,15 +60,16 @@ char** regexRow(char* src, unsigned int row_size)
     return return_value;
 }
 
-void setRow(struct Fraction *row, char *line, unsigned int size)
+void setRow(struct Fraction *row, char *line, unsigned long size)
 {
-    while (size)
+    int index = 0;
+    while (index < size)
     {
         if ((*line == '-' && isdigit(*(line+1))) || isdigit(*line)) {
             long val = strtol(line, &line, 10);
-            row->numerator = val;
-            row->denominator = 1;
-            size--;
+            row[index].numerator = val;
+            row[index].denominator = 1;
+            index++;
             printf("%ld\n", val);
         } else {
             line++;
@@ -77,36 +77,37 @@ void setRow(struct Fraction *row, char *line, unsigned int size)
     }
 }
 
-void buildMatrixFromFile(FILE* input)
+struct Matrix* buildMatrixFromFile(FILE* input)
 {
     struct Matrix* matrix = malloc(sizeof(struct Matrix));
 
     char aux[20], *pEnd;
 
     fgets(aux, 20, input);
-    matrix->lines = strtol(aux, &pEnd, 10);
+    matrix->lines = (unsigned long) strtol(aux, &pEnd, 10);
     matrix->lines++;
 
     fgets(aux, 20, input);
-    matrix->columns = strtol(aux, &pEnd, 10);
+    matrix->columns = (unsigned long) strtol(aux, &pEnd, 10);
     matrix->columns++;
 
     long int line_size = matrix->lines * matrix->columns * 4;
     char line[line_size];
 
-    matrix->cells = malloc(matrix->lines * sizeof(struct Fraction*));
+    matrix->cells = malloc(matrix->lines * sizeof(struct Fraction *));
 
     fgets(line, (int)line_size, input);
 
-    char *rows = regexRow(line);
+    char **rows = regexRow(line, matrix->lines);
 
     int i = 0;
     for (i = 0; i < matrix->lines; i++)
     {
         matrix->cells[i] = malloc(matrix->columns * sizeof(struct Fraction));
-        setRow(matrix->cells[i], line, matrix->columns);
+        setRow(matrix->cells[i], rows[i], matrix->columns);
     }
 
+    return matrix;
 }
 
 int main(int argc, char* argv[])
@@ -116,7 +117,7 @@ int main(int argc, char* argv[])
         file = fopen(argv[1], "r");
     }
 
-    buildMatrixFromFile(NULL == file ? stdin : file);
+    struct Matrix* matrix = buildMatrixFromFile(NULL == file ? stdin : file);
 
     if (NULL == file) {
         fprintf(stderr, "Usage: %s file\nor\n%s < file", argv[0], argv[0]);
