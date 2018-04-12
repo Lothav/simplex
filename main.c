@@ -4,59 +4,41 @@
 #include <ctype.h>
 #include <regex.h>
 #include <string.h>
+#include "matrix.h"
 
-struct Fraction {
-    long numerator;
-    long denominator;
-};
-
-struct Matrix {
-    struct Fraction **cells;
-    unsigned long int lines;
-    unsigned long int columns;
-};
-
-char** regexRow(char* src, long row_size)
+char** regexRow(char* row_src, long row_size, const char* row_pattern)
 {
     int res, len;
-    char *result = malloc(BUFSIZ),
-         **return_value = malloc(row_size * sizeof(char *)),
-         err_buf[BUFSIZ],
-         *aux = src;
-
-    const char* pattern = "\\[((\\-*[0-9]+[\\,\\ ]*)+)\\]";
+    char **return_value = malloc(row_size * sizeof(char *)),
+         *src_ptr = row_src;
 
     regex_t preg;
     regmatch_t pmatch[10];
 
-    if( (res = regcomp(&preg, pattern, REG_EXTENDED)) != 0)
+    if( (res = regcomp(&preg, row_pattern, REG_EXTENDED)) != 0)
     {
+        char err_buf[BUFSIZ];
         regerror(res, &preg, err_buf, BUFSIZ);
         printf("regcomp() error: %s\n", err_buf);
         exit(res);
     }
 
-    long offset = 0;
-    int i;
-    for(i = 0; i < row_size; i++)
+    long offset = 0, i;
+    for (i = 0; i < row_size; i++)
     {
-        aux += offset;
-        res = regexec(&preg, aux, 10, pmatch, REG_NOTBOL);
-        if(res == REG_NOMATCH) break;
+        src_ptr += offset;
+        res = regexec(&preg, src_ptr, 10, pmatch, REG_NOTBOL);
+        if (res == REG_NOMATCH) break;
 
         offset = pmatch[0].rm_eo - pmatch[0].rm_so;
+        len    = pmatch[1].rm_eo - pmatch[1].rm_so;
 
-        len = pmatch[1].rm_eo - pmatch[1].rm_so;
         return_value[i] = malloc((size_t)len + 1);
-        memcpy(return_value[i], aux + pmatch[1].rm_so, (size_t)len);
+        memcpy(return_value[i], src_ptr + pmatch[1].rm_so, (size_t)len);
         return_value[i][len] = '\0';
-
-        printf("%s\n", return_value[i]);
     }
 
     regfree(&preg);
-    free(result);
-
     return return_value;
 }
 
@@ -70,7 +52,6 @@ void setRow(struct Fraction *row, char *line, unsigned long size)
             row[index].numerator = val;
             row[index].denominator = 1;
             index++;
-            printf("%ld\n", val);
         } else {
             line++;
         }
@@ -98,7 +79,7 @@ struct Matrix* buildMatrixFromFile(FILE* input)
 
     fgets(line, (int)line_size, input);
 
-    char **rows = regexRow(line, matrix->lines);
+    char **rows = regexRow(line, matrix->lines, "\\[((\\-*[0-9]+[\\,\\ ]*)+)\\]");
 
     int i = 0;
     for (i = 0; i < matrix->lines; i++)
@@ -117,13 +98,13 @@ int main(int argc, char* argv[])
         file = fopen(argv[1], "r");
     }
 
-    struct Matrix* matrix = buildMatrixFromFile(NULL == file ? stdin : file);
-
-    if (NULL == file) {
+    if (NULL == file && NULL == stdin) {
         fprintf(stderr, "Usage: %s file\nor\n%s < file", argv[0], argv[0]);
         printf("Error opening input file!\nIt can be pass as param or stdin\n");
         return 1;
     }
+
+    struct Matrix* matrix = buildMatrixFromFile(NULL == file ? stdin : file);
 
     fclose(file);
     return 0;
