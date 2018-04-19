@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "file.h"
+#include "tableaux.h"
 
 int main(int argc, char* argv[])
 {
@@ -15,7 +16,7 @@ int main(int argc, char* argv[])
     }
 
     struct Matrix* matrix = buildMatrixFromFile(NULL == file ? stdin : file);
-
+    struct Tableaux* tableaux = buildTableaux(matrix);
     fclose(file);
     return 0;
 }

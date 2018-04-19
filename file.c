@@ -35,7 +35,7 @@ struct Matrix* buildMatrixFromFile(FILE* input)
         index = 0;
         while (index < matrix->columns)
         {
-            if ((*rows[i] == '-' && isdigit(*(rows[i]+1))) || isdigit(*rows[i])) {
+            if (isdigit(*rows[i]) || (*rows[i] == '-' && isdigit(*(rows[i]+1)))) {
                 long val = strtol(rows[i], &rows[i], 10);
                 matrix->cells[i][index].numerator = val;
                 matrix->cells[i][index].denominator = 1;
