@@ -2,29 +2,47 @@
 #include "file.h"
 #include "util.h"
 
+#define POSIX_SUGGEST_SIZE 4096
+
+// Read a matrix from file.
+// File must have following format:
+//
+// m
+// n
+// [[line 0], [line 1], ..., [line n]]
+//
+// where m: column size - 1
+//       n: line size - 1
+//
+// File example:
+// 2
+// 3
+// [[1, 2, 3, 0], [1, 1, 1, 2], [0, −1, 3, 9]
 struct Matrix* buildMatrixFromFile(FILE* input)
 {
     struct Matrix* matrix = malloc(sizeof(struct Matrix));
 
-    char aux[NUMBER_MAX_DIGITS], *pEnd;
+    char mn[NUMBER_MAX_DIGITS], *pEnd;
 
-    /* Build Lines */
-    fgets(aux, NUMBER_MAX_DIGITS, input);
-    matrix->lines = (unsigned long) strtol(aux, &pEnd, 10);
+    // ============================================================================================
+    // Build lines
+    fgets(mn, NUMBER_MAX_DIGITS, input);
+    matrix->lines = (unsigned long) strtol(mn, &pEnd, 10);
     matrix->lines++;
 
-    /* Build Columns */
-    fgets(aux, NUMBER_MAX_DIGITS, input);
-    matrix->columns = (unsigned long) strtol(aux, &pEnd, 10);
+    // ============================================================================================
+    // Build columns
+    fgets(mn, NUMBER_MAX_DIGITS, input);
+    matrix->columns = (unsigned long) strtol(mn, &pEnd, 10);
     matrix->columns++;
 
-    /* Build Cells */
-    long int line_size = matrix->lines * matrix->columns * 4;
-    char line[line_size];
+    // ============================================================================================
+    // Build Cells
+    char line[POSIX_SUGGEST_SIZE];
 
     matrix->cells = malloc(matrix->lines * sizeof(struct Fraction *));
 
-    fgets(line, (int)line_size, input);
+    fgets(line, POSIX_SUGGEST_SIZE, input);
 
     char **rows = regexRow(line, matrix->lines, "\\[((\\-*[0-9]+[\\,\\ ]*)+)\\]");
 
