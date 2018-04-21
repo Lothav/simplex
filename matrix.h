@@ -12,6 +12,6 @@ struct Matrix {
     unsigned long int columns;
 };
 
-
+void initFraction(struct Fraction*);
 
 #endif //SIMPLEX_MATRIX_H
