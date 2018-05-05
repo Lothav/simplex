@@ -22,10 +22,56 @@ public:
         simplify();
     }
 
+    Fraction* operator *(const Fraction& fraction)
+    {
+        return new Fraction(this->numerator_ * fraction.getNumerator(), this->denominator_ * fraction.getDenominator());
+    }
+
+    // Boolean Operators
+    bool operator <(const Fraction& fraction)
+    {
+        return this->numerator_ * fraction.getDenominator() < this->denominator_ * fraction.getNumerator();
+    }
+
+    bool operator >(const Fraction& fraction)
+    {
+        return this->numerator_ * fraction.getDenominator() > this->denominator_ * fraction.getNumerator();
+    }
+
+    bool operator <(const long& number)
+    {
+        return (this->numerator_ / this->denominator_) < number;
+    }
+
+    bool operator <=(const long& number)
+    {
+        return (this->numerator_ / this->denominator_) <= number;
+    }
+
+    bool operator >(const long& number)
+    {
+        return (this->numerator_ / this->denominator_) > number;
+    }
+
+    Fraction* operator /(const Fraction& fraction)
+    {
+        return new Fraction(this->numerator_ * fraction.getDenominator(), this->denominator_ * fraction.getNumerator());
+    }
+
 private:
 
     long gcd(long a, long b) {
         return b == 0 ? a : gcd(b, a % b);
+    }
+
+    long getNumerator() const
+    {
+        return numerator_;
+    }
+
+    long getDenominator() const
+    {
+        return denominator_;
     }
 
     void simplify()
