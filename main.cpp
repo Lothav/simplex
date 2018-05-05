@@ -7,6 +7,7 @@
 #include <cstring>
 #include <vector>
 #include <regex>
+#include "Matrix.hpp"
 
 std::vector<std::string> readStream(std::istream& input_stream)
 {
@@ -77,7 +78,12 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    auto matrix_data = getMatrixDataFromString(file_data[2]);
+    auto matrix_m = std::stoi (file_data[0]);
+    auto matrix_n = std::stoi (file_data[1]);
+    auto matrix_cells = getMatrixDataFromString(file_data[2]);
+
+    auto matrix = new Matrix(matrix_m, matrix_n, matrix_cells);
+
 
     return EXIT_SUCCESS;
 }

@@ -11,6 +11,7 @@ class Fraction
 {
 
 private:
+
     long numerator_;
     long denominator_;
 
