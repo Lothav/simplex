@@ -6,6 +6,7 @@
 #define SIMPLEX_MATRIX_HPP
 
 #include <vector>
+#include <iostream>
 #include "Fraction.hpp"
 
 class Matrix {
@@ -31,6 +32,22 @@ public:
     void putInFPI();
 
     bool isInFPI();
+
+    void updateCell(int i, int j, Fraction* cell)
+    {
+        if (i >= this->m_) {
+            std::cerr << "Error trying update matrix. Invalid line index " << i << std::endl;
+            return;
+        }
+
+        if (j >= this->n_) {
+            std::cerr << "Error trying update matrix. Invalid column index " << j << std::endl;
+            return;
+        }
+
+        free(this->cells_[i][j]);
+        this->cells_[i][j] = cell;
+    }
 
 };
 

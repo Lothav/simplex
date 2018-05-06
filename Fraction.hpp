@@ -58,12 +58,6 @@ public:
         return new Fraction(this->numerator_ * fraction.getDenominator(), this->denominator_ * fraction.getNumerator());
     }
 
-private:
-
-    long gcd(long a, long b) {
-        return b == 0 ? a : gcd(b, a % b);
-    }
-
     long getNumerator() const
     {
         return numerator_;
@@ -73,6 +67,13 @@ private:
     {
         return denominator_;
     }
+
+private:
+
+    long gcd(long a, long b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+
 
     void simplify()
     {

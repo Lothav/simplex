@@ -7,7 +7,7 @@
 #include <cstring>
 #include <vector>
 #include <regex>
-#include "Matrix.hpp"
+#include "Tableaux.hpp"
 
 std::vector<std::string> readStream(std::istream& input_stream)
 {
@@ -60,47 +60,6 @@ std::vector<long> getMatrixDataFromString(std::string matrix_data_string)
     return matrix_data_long;
 }
 
-std::array<int, 2> primalElement(const Matrix& matrix)
-{
-    std::array<int, 2> index = {};
-
-    // Iterate in 'c' vector elements.
-    for (int i = 0; i < matrix.getN()-1; ++i) {
-
-        // Get 'c' vector element.
-        auto c_element = *matrix.getCells()[0][i];
-
-        // Check if 'c' is negative.
-        if (c_element < 0) {
-
-            Fraction lower (INTMAX_MAX, 1);
-
-            // Iterate in 'b' vector elements
-            for (int j = 1; j < matrix.getM(); ++j) {
-
-                // Get correspondent positive A element.
-                Fraction A_element = *matrix.getCells()[j][i];
-                if (A_element <= 0) {
-                    continue;
-                }
-
-                // Get 'b' vector element.
-                Fraction b_element = *matrix.getCells()[j][matrix.getN()-1];
-
-                // Find lower 'b' element divided by 'A' element.
-                if (lower > *(b_element/A_element)) {
-                    lower = b_element;
-                    index = {j, i};
-                }
-            }
-
-            return index;
-        }
-    }
-
-    return index;
-}
-
 int main(int argc, char** argv)
 {
     std::vector<std::string> file_data;
@@ -123,10 +82,8 @@ int main(int argc, char** argv)
     auto matrix_n = std::stoi (file_data[1]);
     auto matrix_cells = getMatrixDataFromString(file_data[2]);
 
-    auto matrix = new Matrix(matrix_m+1, matrix_n+1, matrix_cells);
-    matrix->putInFPI();
-
-    std::array<int, 2> indexes = primalElement(*matrix);
+    // Generate matrix from input file.
+    auto tableaux = new Tableaux(matrix_m+1, matrix_n+1, matrix_cells);
 
     return EXIT_SUCCESS;
 }
