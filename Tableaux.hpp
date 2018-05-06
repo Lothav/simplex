@@ -8,16 +8,22 @@
 #include <array>
 #include "Matrix.hpp"
 
+enum SolveMethod {
+    DUAL_METHOD,
+    PRIMAL_METHOD
+};
+
 class Tableaux
 {
 
 private:
 
     Matrix* matrix_;
+    SolveMethod solve_method_;
 
 public:
 
-    Tableaux(long m, long n, const std::vector<long> &cells)
+    Tableaux(long m, long n, const std::vector<long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
     {
         matrix_ = new Matrix(m, n, cells);
 
@@ -34,29 +40,22 @@ public:
 
     void solve()
     {
-        this->checkDualMethodApplies();
+        this->solve_method_ = this->getWhichSolveMethodApplies();
+
+        if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
+            auto primal_indexes = getPrimalMatrixIndex();
+            return;
+        }
+
+        if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
+
+            return;
+        }
     }
 
 private:
 
-    bool checkDualMethodApplies() const
-    {
-        // 'c' elements can't be < 0
-        for (int j = 0; j < this->matrix_->getN(); j++) {
-            if (this->matrix_->getCells()[0][j] < 0) {
-                return false;
-            }
-        }
-
-        // and check if we have an 'b' element negative.
-        for (int i = 0; i < this->matrix_->getM(); i++) {
-            if (this->matrix_->getCells()[i][this->matrix_->getN() - 1]) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    SolveMethod getWhichSolveMethodApplies() const;
 
     std::array<int, 2> getPrimalMatrixIndex() const
     {

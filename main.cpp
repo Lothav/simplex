@@ -84,6 +84,7 @@ int main(int argc, char** argv)
 
     // Generate matrix from input file.
     auto tableaux = new Tableaux(matrix_m+1, matrix_n+1, matrix_cells);
+    tableaux->solve();
 
     return EXIT_SUCCESS;
 }
