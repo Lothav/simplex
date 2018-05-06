@@ -64,20 +64,21 @@ std::array<int, 2> primalElement(const Matrix& matrix)
 {
     std::array<int, 2> index = {};
 
+    // Iterate in 'c' vector elements.
     for (int i = 0; i < matrix.getN()-1; ++i) {
 
-        // Iterate in 'c' vector elements.
+        // Get 'c' vector element.
         auto c_element = *matrix.getCells()[0][i];
 
+        // Check if 'c' is negative.
         if (c_element < 0) {
 
-            // Find first 'c' negative element.
             Fraction lower (INTMAX_MAX, 1);
 
             // Iterate in 'b' vector elements
             for (int j = 1; j < matrix.getM(); ++j) {
 
-                // Get correspondent A element.
+                // Get correspondent positive A element.
                 Fraction A_element = *matrix.getCells()[j][i];
                 if (A_element <= 0) {
                     continue;
@@ -92,6 +93,8 @@ std::array<int, 2> primalElement(const Matrix& matrix)
                     index = {j, i};
                 }
             }
+
+            return index;
         }
     }
 
@@ -121,7 +124,9 @@ int main(int argc, char** argv)
     auto matrix_cells = getMatrixDataFromString(file_data[2]);
 
     auto matrix = new Matrix(matrix_m+1, matrix_n+1, matrix_cells);
-    primalElement(*matrix);
+    matrix->putInFPI();
+
+    std::array<int, 2> indexes = primalElement(*matrix);
 
     return EXIT_SUCCESS;
 }
