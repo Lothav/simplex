@@ -13,10 +13,9 @@ class Tableaux
 
 private:
 
+    Matrix* matrix_;
 
 public:
-
-    Matrix* matrix_;
 
     Tableaux(long m, long n, const std::vector<long> &cells)
     {
@@ -33,7 +32,31 @@ public:
         }
     }
 
+    void solve()
+    {
+        this->checkDualMethodApplies();
+    }
+
 private:
+
+    bool checkDualMethodApplies() const
+    {
+        // 'c' elements can't be < 0
+        for (int j = 0; j < this->matrix_->getN(); j++) {
+            if (this->matrix_->getCells()[0][j] < 0) {
+                return false;
+            }
+        }
+
+        // and check if we have an 'b' element negative.
+        for (int i = 0; i < this->matrix_->getM(); i++) {
+            if (this->matrix_->getCells()[i][this->matrix_->getN() - 1]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     std::array<int, 2> getPrimalMatrixIndex() const
     {
