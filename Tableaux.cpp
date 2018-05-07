@@ -5,7 +5,7 @@
 #include <climits>
 #include "Tableaux.hpp"
 
-Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
+Tableaux::Tableaux(long long m, long long n, const std::vector<long long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
 {
     matrix_ = new Matrix(m, n, cells);
 
@@ -177,11 +177,16 @@ std::array<int, 2> Tableaux::getDualMatrixIndex() const
                 }
 
                 // Get 'c' vector element.
-                Fraction c_element = *matrix_->getCells()[0][j];
+                Fraction* c_element = matrix_->getCells()[0][j];
+                if (c_element <= 0) {
+                    continue;
+                }
+
+                auto c_divided_by_A = *(*c_element / *(A_element*(-1)));
 
                 // Find lower 'b' element divided by 'A' element.
-                if (lower > *(c_element/A_element)) {
-                    lower = c_element;
+                if (index[0] == -1 || lower > c_divided_by_A) {
+                    lower = c_divided_by_A;
                     index = {i, j};
                 }
             }

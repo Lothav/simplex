@@ -21,7 +21,7 @@ private:
 
 public:
 
-    Matrix(long m, long n, const std::vector<long>& cells);
+    Matrix(long m, long n, const std::vector<long long>& cells);
 
     long getM() const;
 

@@ -24,7 +24,7 @@ private:
 
 public:
 
-    Tableaux(long m, long n, const std::vector<long> &cells);
+    Tableaux(long long m, long long n, const std::vector<long long> &cells);
 
     void solve(std::string file_output_steps, std::string file_output_result);
 

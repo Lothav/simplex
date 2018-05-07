@@ -25,7 +25,7 @@ public:
 
     static void WriteOnFile(std::string path, std::string data);
 
-    static std::vector<long> GetIntsFromStringFile(std::string data_string);
+    static std::vector<long long> GetIntsFromStringFile(std::string data_string);
 
 private:
 

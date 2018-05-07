@@ -12,23 +12,23 @@ class Fraction
 
 private:
 
-    int numerator_;
-    int denominator_;
+    long long numerator_;
+    long long denominator_;
 
 public:
 
-    Fraction(int numerator, int denominator);
+    Fraction(long long numerator, long long denominator);
 
     // Boolean Operators
-    bool operator <(const int& number);
+    bool operator <(const long long& number);
 
-    bool operator <=(const int& number);
+    bool operator <=(const long long& number);
 
-    bool operator >=(const int& number);
+    bool operator >=(const long long& number);
 
-    bool operator >(const int& number);
+    bool operator >(const long long& number);
 
-    Fraction* operator *(const int& number);
+    Fraction* operator *(const long long& number);
 
     bool operator <(const Fraction& fraction);
 
@@ -42,15 +42,15 @@ public:
 
     Fraction* operator +(const Fraction& fraction);
 
-    int getNumerator() const;
+    long long getNumerator() const;
 
-    int getDenominator() const;
+    long long getDenominator() const;
 
     float getFloatValue() const;
 
 private:
 
-    int gcd(int a, int b) const;
+    long long gcd(long long a, long long b) const;
 
     void simplify();
 

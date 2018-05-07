@@ -33,9 +33,9 @@ void File::WriteOnFile(std::string path, std::string data)
     out_file.close();
 }
 
-std::vector<long> File::GetIntsFromStringFile(std::string data_string)
+std::vector<long long> File::GetIntsFromStringFile(std::string data_string)
 {
-    std::vector<long> data_int = {};
+    std::vector<long long> data_int = {};
 
     std::regex r("(\\+|-)?[[:digit:]]+");
     std::smatch m;

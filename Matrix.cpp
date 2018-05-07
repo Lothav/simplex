@@ -4,7 +4,7 @@
 
 #include "Matrix.hpp"
 
-Matrix::Matrix(long m, long n, const std::vector<long> &cells): m_(m), n_(n), in_fpi_(false)
+Matrix::Matrix(long m, long n, const std::vector<long long> &cells): m_(m), n_(n), in_fpi_(false)
 {
     int i, j;
     for (i = 0 ; i < m_; i++) {
@@ -79,10 +79,10 @@ std::string Matrix::toString() const
         }
         matrix_string += "]";
         if(i != this->getM()-1){
-            matrix_string += ", ";
+            matrix_string += ", \n";
         }
     }
-    matrix_string += "]";
+    matrix_string += "]\n";
 
     return matrix_string;
 }

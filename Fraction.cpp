@@ -4,7 +4,7 @@
 
 #include "Fraction.hpp"
 
-Fraction::Fraction(int numerator, int denominator) : numerator_(numerator), denominator_(denominator)
+Fraction::Fraction(long long numerator, long long denominator) : numerator_(numerator), denominator_(denominator)
 {
     if (denominator == 0) {
         throw "Denominator can't be zero!";
@@ -29,22 +29,22 @@ bool Fraction::operator >(const Fraction& fraction)
     return (this->numerator_ * fraction.getDenominator()) > (this->denominator_ * fraction.getNumerator());
 }
 
-bool Fraction::operator <(const int& number)
+bool Fraction::operator <(const long long& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) < number;
 }
 
-bool Fraction::operator <=(const int& number)
+bool Fraction::operator <=(const long long& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) <= number;
 }
 
-bool Fraction::operator >=(const int& number)
+bool Fraction::operator >=(const long long& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) >= number;
 }
 
-bool Fraction::operator >(const int& number)
+bool Fraction::operator >(const long long& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) > number;
 }
@@ -68,17 +68,17 @@ Fraction* Fraction::operator +(const Fraction& fraction)
     return new Fraction((this->numerator_ * fraction.getDenominator()) + (fraction.getNumerator() * this->denominator_), this->denominator_ * fraction.getDenominator());
 }
 
-Fraction* Fraction::operator *(const int& number)
+Fraction* Fraction::operator *(const long long& number)
 {
     return new Fraction(this->numerator_ * number, this->denominator_);
 }
 
-int Fraction::getNumerator() const
+long long Fraction::getNumerator() const
 {
     return numerator_;
 }
 
-int Fraction::getDenominator() const
+long long Fraction::getDenominator() const
 {
     return denominator_;
 }
@@ -89,14 +89,14 @@ float Fraction::getFloatValue() const
 }
 
 
-int Fraction::gcd(int a, int b) const
+long long Fraction::gcd(long long a, long long b) const
 {
     return b == 0 ? a : gcd(b, a % b);
 }
 
 void Fraction::simplify()
 {
-    int gcd_ = gcd(this->numerator_, this->denominator_);
+    long long gcd_ = gcd(this->numerator_, this->denominator_);
     this->denominator_ /= gcd_;
     this->numerator_   /= gcd_;
 }
