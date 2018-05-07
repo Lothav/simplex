@@ -7,6 +7,7 @@
 
 #include <array>
 #include "Matrix.hpp"
+#include "File.hpp"
 
 enum SolveMethod {
     DUAL_METHOD,
@@ -45,6 +46,8 @@ public:
         if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
             auto primal_indexes = getPrimalMatrixIndex();
             this->pivot(primal_indexes);
+            std::string matrix_str = this->matrix_->toString();
+            File::WriteOnFile(file_output_steps, matrix_str);
             return;
         }
 

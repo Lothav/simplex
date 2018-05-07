@@ -8,7 +8,6 @@
 #include <vector>
 #include <regex>
 #include "Tableaux.hpp"
-#include "File.hpp"
 
 int main(int argc, char** argv)
 {
@@ -34,7 +33,7 @@ int main(int argc, char** argv)
 
     // Generate matrix from input file.
     auto tableaux = new Tableaux(matrix_m+1, matrix_n+1, matrix_cells);
-    tableaux->solve("steps.txt", "conclusao.txt");
+    tableaux->solve("pivoteamento.txt", "conclusao.txt");
 
     return EXIT_SUCCESS;
 }

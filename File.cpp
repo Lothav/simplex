@@ -4,7 +4,7 @@
 
 #include "File.hpp"
 
-static std::vector<std::string> File::GetFileData(std::string path)
+std::vector<std::string> File::GetFileData(std::string path)
 {
     std::vector<std::string> file_data = {};
 
@@ -20,17 +20,20 @@ static std::vector<std::string> File::GetFileData(std::string path)
     return file_data;
 }
 
-static std::vector<std::string> File::GetStdInData()
+std::vector<std::string> File::GetStdInData()
 {
     return readStream(std::cin);
 }
 
-static void File::WriteOnFile()
+void File::WriteOnFile(std::string path, std::string data)
 {
-
+    std::ofstream out_file;
+    out_file.open (path);
+    out_file << data << "\n";
+    out_file.close();
 }
 
-static std::vector<long> File::GetIntsFromStringFile(std::string data_string)
+std::vector<long> File::GetIntsFromStringFile(std::string data_string)
 {
     std::vector<long> data_int = {};
 
@@ -46,7 +49,7 @@ static std::vector<long> File::GetIntsFromStringFile(std::string data_string)
 }
 
 
-static std::vector<std::string> File::readStream(std::istream& input_stream)
+std::vector<std::string> File::readStream(std::istream& input_stream)
 {
     std::vector<std::string> lines;
 
