@@ -62,7 +62,6 @@ void Matrix::updateCell(int i, int j, Fraction* cell)
         return;
     }
 
-    free(this->cells_[i][j]);
     this->cells_[i][j] = cell;
 }
 
@@ -91,7 +90,6 @@ bool Matrix::isInFPI() const
 {
     return this->in_fpi_;
 }
-
 
 long Matrix::getM() const
 {

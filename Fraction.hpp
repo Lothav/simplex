@@ -71,6 +71,11 @@ public:
         return new Fraction((this->numerator_ * fraction.getDenominator()) - (fraction.getNumerator() * this->denominator_), this->denominator_ * fraction.getDenominator());
     }
 
+    Fraction* operator +(const Fraction& fraction)
+    {
+        return new Fraction((this->numerator_ * fraction.getDenominator()) + (fraction.getNumerator() * this->denominator_), this->denominator_ * fraction.getDenominator());
+    }
+
     long getNumerator() const
     {
         return numerator_;
@@ -81,14 +86,15 @@ public:
         return denominator_;
     }
 
-    float getFloatValue()
+    float getFloatValue() const
     {
         return this->numerator_ / this->denominator_;
     }
 
 private:
 
-    long gcd(long a, long b) {
+    long gcd(long a, long b) const
+    {
         return b == 0 ? a : gcd(b, a % b);
     }
 

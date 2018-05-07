@@ -77,6 +77,9 @@ void Tableaux::pivot(const std::array<int, 2>& indexes)
         this->matrix_->updateCell(indexes[0], i, *matrix_cells[indexes[0]][i] / *pivot);
     }
 
+    // Get updated cells.
+    matrix_cells = this->matrix_->getCells();
+
     // Loop matrix lines.
     for (int i = 0; i < this->matrix_->getM(); ++i) {
 
@@ -96,6 +99,9 @@ void Tableaux::pivot(const std::array<int, 2>& indexes)
 
             // Update current cell with the new calculated cell.
             this->matrix_->updateCell(i, j, new_cell);
+
+            // Get updated cells.
+            matrix_cells = this->matrix_->getCells();
         }
     }
 }
