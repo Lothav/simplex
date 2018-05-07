@@ -24,6 +24,8 @@ public:
 
     bool operator <=(const int& number);
 
+    bool operator >=(const int& number);
+
     bool operator >(const int& number);
 
     Fraction* operator *(const int& number);

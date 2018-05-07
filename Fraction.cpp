@@ -39,6 +39,11 @@ bool Fraction::operator <=(const int& number)
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) <= number;
 }
 
+bool Fraction::operator >=(const int& number)
+{
+    return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) >= number;
+}
+
 bool Fraction::operator >(const int& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) > number;

@@ -28,7 +28,7 @@ std::vector<std::string> File::GetStdInData()
 void File::WriteOnFile(std::string path, std::string data)
 {
     std::ofstream out_file;
-    out_file.open (path);
+    out_file.open(path, std::ios::app);
     out_file << data << "\n";
     out_file.close();
 }
@@ -57,7 +57,6 @@ std::vector<std::string> File::readStream(std::istream& input_stream)
     while (!input_stream.eof()) {
         if (std::getline(input_stream, line)) {
             lines.push_back(line);
-            std::cout << "You typed:" << line << std::endl;
         }
     }
 

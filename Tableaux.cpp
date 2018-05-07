@@ -45,11 +45,13 @@ void Tableaux::solve(std::string file_output_steps, std::string file_output_resu
     this->solve_method_ = this->getWhichSolveMethodApplies();
 
     if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
+        std::cout << "Using Primal method." << std::endl;
         while (stepPrimal(file_output_steps, file_output_result));
         return;
     }
 
     if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
+        std::cout << "Using Dual method." << std::endl;
         while(stepDual(file_output_steps, file_output_result));
         return;
     }
@@ -85,8 +87,8 @@ bool Tableaux::stepDual(std::string file_output_steps, std::string file_output_r
 
     // Multiply line to pivot to -1.
     for (int i = 0; i < this->matrix_->getN(); ++i) {
-        auto matrix_cell = this->matrix_->getCells()[i][dual_indexes[1]];
-        this->matrix_->updateCell(i, dual_indexes[1], *matrix_cell * -1);
+        auto matrix_cell = this->matrix_->getCells()[dual_indexes[0]][i];
+        this->matrix_->updateCell(dual_indexes[0], i, *matrix_cell * -1);
     }
 
     // Pivot dual element.
@@ -160,7 +162,7 @@ std::array<int, 2> Tableaux::getDualMatrixIndex() const
 
                 // Get correspondent positive A element.
                 Fraction A_element = *matrix_->getCells()[i][j];
-                if (A_element <= 0) {
+                if (A_element >= 0) {
                     continue;
                 }
 
