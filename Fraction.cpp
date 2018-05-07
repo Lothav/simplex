@@ -29,17 +29,17 @@ bool Fraction::operator >(const Fraction& fraction)
     return (this->numerator_ * fraction.getDenominator()) > (this->denominator_ * fraction.getNumerator());
 }
 
-bool Fraction::operator <(const long& number)
+bool Fraction::operator <(const int& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) < number;
 }
 
-bool Fraction::operator <=(const long& number)
+bool Fraction::operator <=(const int& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) <= number;
 }
 
-bool Fraction::operator >(const long& number)
+bool Fraction::operator >(const int& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) > number;
 }
@@ -61,6 +61,11 @@ Fraction* Fraction::operator -(const Fraction& fraction)
 Fraction* Fraction::operator +(const Fraction& fraction)
 {
     return new Fraction((this->numerator_ * fraction.getDenominator()) + (fraction.getNumerator() * this->denominator_), this->denominator_ * fraction.getDenominator());
+}
+
+Fraction* Fraction::operator *(const int& number)
+{
+    return new Fraction(this->numerator_ * number, this->denominator_);
 }
 
 int Fraction::getNumerator() const

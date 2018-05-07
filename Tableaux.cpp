@@ -20,21 +20,6 @@ Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_metho
     }
 }
 
-void Tableaux::solve(std::string file_output_steps, std::string file_output_result)
-{
-    this->solve_method_ = this->getWhichSolveMethodApplies();
-
-    if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
-        while (stepPrimal(file_output_steps, file_output_result));
-        return;
-    }
-
-    if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
-        while(stepDual(file_output_steps, file_output_result));
-        return;
-    }
-}
-
 SolveMethod Tableaux::getWhichSolveMethodApplies() const
 {
     // check 'c' elements. If less than zero, primal applies (with aux matrix or not).
@@ -53,6 +38,21 @@ SolveMethod Tableaux::getWhichSolveMethodApplies() const
 
     // otherwise, default primal method.
     return PRIMAL_METHOD;
+}
+
+void Tableaux::solve(std::string file_output_steps, std::string file_output_result)
+{
+    this->solve_method_ = this->getWhichSolveMethodApplies();
+
+    if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
+        while (stepPrimal(file_output_steps, file_output_result));
+        return;
+    }
+
+    if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
+        while(stepDual(file_output_steps, file_output_result));
+        return;
+    }
 }
 
 bool Tableaux::stepPrimal(std::string file_output_steps, std::string file_output_result)
@@ -83,7 +83,13 @@ bool Tableaux::stepDual(std::string file_output_steps, std::string file_output_r
         return false;
     }
 
-    // Pivot primal element.
+    // Multiply line to pivot to -1.
+    for (int i = 0; i < this->matrix_->getN(); ++i) {
+        auto matrix_cell = this->matrix_->getCells()[i][dual_indexes[1]];
+        this->matrix_->updateCell(i, dual_indexes[1], *matrix_cell * -1);
+    }
+
+    // Pivot dual element.
     this->pivot(dual_indexes);
 
     // Write matrix step on file.

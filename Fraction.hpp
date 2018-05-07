@@ -20,15 +20,17 @@ public:
     Fraction(int numerator, int denominator);
 
     // Boolean Operators
+    bool operator <(const int& number);
+
+    bool operator <=(const int& number);
+
+    bool operator >(const int& number);
+
+    Fraction* operator *(const int& number);
+
     bool operator <(const Fraction& fraction);
 
     bool operator >(const Fraction& fraction);
-
-    bool operator <(const long& number);
-
-    bool operator <=(const long& number);
-
-    bool operator >(const long& number);
 
     Fraction* operator *(const Fraction& fraction);
 
