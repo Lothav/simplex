@@ -88,7 +88,7 @@ public:
 
     float getFloatValue() const
     {
-        return this->numerator_ / this->denominator_;
+        return static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_);
     }
 
 private:

@@ -71,7 +71,8 @@ std::string Matrix::toString() const
     for (int i = 0; i < this->getM(); ++i) {
         matrix_string += "[";
         for (int j = 0; j < this->getN(); ++j) {
-            matrix_string += std::to_string(this->cells_[i][j]->getFloatValue());
+            float value = this->cells_[i][j]->getFloatValue();
+            matrix_string += std::to_string(value);
             if(j != this->getN()-1){
                 matrix_string += ", ";
             }
