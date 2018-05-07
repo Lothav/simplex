@@ -5,6 +5,36 @@
 #include <climits>
 #include "Tableaux.hpp"
 
+Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
+{
+    matrix_ = new Matrix(m, n, cells);
+
+    if (!matrix_->isInFPI()) {
+        matrix_->putInFPI();
+    }
+
+    // Iterate in first matrix column. Set all elements to negative.
+    for (int j = 0; j < matrix_->getN(); ++j) {
+        auto element = matrix_->getCells()[0][j];
+        matrix_->updateCell(0, j, new Fraction(element->getNumerator() * -1, element->getDenominator()));
+    }
+}
+
+void Tableaux::solve(std::string file_output_steps, std::string file_output_result)
+{
+    this->solve_method_ = this->getWhichSolveMethodApplies();
+
+    if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
+        while (stepPrimal(file_output_steps, file_output_result));
+        return;
+    }
+
+    if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
+        while(stepDual(file_output_steps, file_output_result));
+        return;
+    }
+}
+
 SolveMethod Tableaux::getWhichSolveMethodApplies() const
 {
     // check 'c' elements. If less than zero, primal applies (with aux matrix or not).
