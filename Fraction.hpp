@@ -19,6 +19,10 @@ public:
 
     Fraction(long numerator, long denominator) : numerator_(numerator), denominator_(denominator)
     {
+        if (denominator == 0) {
+            throw "Denominator can't be zero!";
+        }
+
         simplify();
     }
 
@@ -55,6 +59,10 @@ public:
 
     Fraction* operator /(const Fraction& fraction)
     {
+        if (fraction.getNumerator() == 0) {
+            return new Fraction(0, 1);
+        }
+
         return new Fraction(this->numerator_ * fraction.getDenominator(), this->denominator_ * fraction.getNumerator());
     }
 
