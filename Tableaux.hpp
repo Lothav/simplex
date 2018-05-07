@@ -44,6 +44,7 @@ public:
 
         if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
             auto primal_indexes = getPrimalMatrixIndex();
+            this->pivot(primal_indexes);
             return;
         }
 
@@ -57,47 +58,9 @@ private:
 
     SolveMethod getWhichSolveMethodApplies() const;
 
-    std::array<int, 2> getPrimalMatrixIndex() const
-    {
-        std::array<int, 2> index = {};
+    std::array<int, 2> getPrimalMatrixIndex() const;
 
-        // Iterate in 'c' vector elements.
-        for (int i = 0; i < matrix_->getN()-1; ++i) {
-
-            // Get 'c' vector element.
-            auto c_element = *matrix_->getCells()[0][i];
-
-            // Check if 'c' is negative.
-            if (c_element < 0) {
-
-                Fraction lower (INTMAX_MAX, 1);
-
-                // Iterate in 'b' vector elements
-                for (int j = 1; j < matrix_->getM(); ++j) {
-
-                    // Get correspondent positive A element.
-                    Fraction A_element = *matrix_->getCells()[j][i];
-                    if (A_element <= 0) {
-                        continue;
-                    }
-
-                    // Get 'b' vector element.
-                    Fraction b_element = *matrix_->getCells()[j][matrix_->getN()-1];
-
-                    // Find lower 'b' element divided by 'A' element.
-                    if (lower > *(b_element/A_element)) {
-                        lower = b_element;
-                        index = {j, i};
-                    }
-                }
-
-                return index;
-            }
-        }
-
-        return index;
-    }
-
+    void pivot(const std::array<int, 2>& indexes);
 
 };
 

@@ -58,6 +58,11 @@ public:
         return new Fraction(this->numerator_ * fraction.getDenominator(), this->denominator_ * fraction.getNumerator());
     }
 
+    Fraction* operator -(const Fraction& fraction)
+    {
+        return new Fraction((this->numerator_ * fraction.getDenominator()) - (fraction.getNumerator() * this->denominator_), this->denominator_ * fraction.getDenominator());
+    }
+
     long getNumerator() const
     {
         return numerator_;
@@ -69,6 +74,10 @@ public:
     }
 
 private:
+
+    long mmc(long a, long b) {
+
+    }
 
     long gcd(long a, long b) {
         return b == 0 ? a : gcd(b, a % b);
