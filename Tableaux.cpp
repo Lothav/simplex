@@ -137,10 +137,15 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
 
                 // Get 'b' vector element.
                 Fraction b_element = *matrix_->getCells()[j][matrix_->getN()-1];
+                if (b_element <= 0) {
+                    continue;
+                }
+
+                auto b_divided_by_A = *(b_element/A_element);
 
                 // Find lower 'b' element divided by 'A' element.
-                if (lower > *(b_element/A_element)) {
-                    lower = b_element;
+                if (index[0] == -1 || lower > b_divided_by_A) {
+                    lower = b_divided_by_A;
                     index = {j, i};
                 }
             }
