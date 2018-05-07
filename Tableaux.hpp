@@ -38,7 +38,7 @@ public:
         }
     }
 
-    void solve()
+    void solve(std::string file_output_steps, std::string file_output_result)
     {
         this->solve_method_ = this->getWhichSolveMethodApplies();
 

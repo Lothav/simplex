@@ -50,7 +50,44 @@ void Matrix::putInFPI()
     this->in_fpi_ = true;
 }
 
-bool Matrix::isInFPI()
+void Matrix::updateCell(int i, int j, Fraction* cell)
+{
+    if (i >= this->m_) {
+        std::cerr << "Error trying update matrix. Invalid line index " << i << std::endl;
+        return;
+    }
+
+    if (j >= this->n_) {
+        std::cerr << "Error trying update matrix. Invalid column index " << j << std::endl;
+        return;
+    }
+
+    free(this->cells_[i][j]);
+    this->cells_[i][j] = cell;
+}
+
+std::string Matrix::toString() const
+{
+    std::string matrix_string = "[";
+    for (int i = 0; i < this->getM(); ++i) {
+        matrix_string += "[";
+        for (int j = 0; j < this->getN(); ++j) {
+            matrix_string += std::to_string(this->cells_[i][j]->getFloatValue());
+            if(i != this->getN()-1){
+                matrix_string += ", ";
+            }
+        }
+        matrix_string += "]";
+        if(i != this->getM()-1){
+            matrix_string += ", ";
+        }
+    }
+    matrix_string += "]";
+
+    return matrix_string;
+}
+
+bool Matrix::isInFPI() const
 {
     return this->in_fpi_;
 }

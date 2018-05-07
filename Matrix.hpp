@@ -31,23 +31,11 @@ public:
 
     void putInFPI();
 
-    bool isInFPI();
+    bool isInFPI() const;
 
-    void updateCell(int i, int j, Fraction* cell)
-    {
-        if (i >= this->m_) {
-            std::cerr << "Error trying update matrix. Invalid line index " << i << std::endl;
-            return;
-        }
+    void updateCell(int i, int j, Fraction* cell);
 
-        if (j >= this->n_) {
-            std::cerr << "Error trying update matrix. Invalid column index " << j << std::endl;
-            return;
-        }
-
-        free(this->cells_[i][j]);
-        this->cells_[i][j] = cell;
-    }
+    std::string toString() const;
 
 };
 

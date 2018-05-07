@@ -73,11 +73,12 @@ public:
         return denominator_;
     }
 
-private:
-
-    long mmc(long a, long b) {
-
+    float getFloatValue()
+    {
+        return this->numerator_ / this->denominator_;
     }
+
+private:
 
     long gcd(long a, long b) {
         return b == 0 ? a : gcd(b, a % b);
