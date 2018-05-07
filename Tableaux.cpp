@@ -2,6 +2,7 @@
 // Created by luiz0tavio on 5/5/18.
 //
 
+#include <climits>
 #include "Tableaux.hpp"
 
 SolveMethod Tableaux::getWhichSolveMethodApplies() const
@@ -37,7 +38,7 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
         // Check if 'c' is negative.
         if (c_element < 0) {
 
-            Fraction lower (INTMAX_MAX, 1);
+            Fraction lower (INT_MAX, 1);
 
             // Iterate in 'b' vector elements
             for (int j = 1; j < matrix_->getM(); ++j) {

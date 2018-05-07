@@ -12,12 +12,12 @@ class Fraction
 
 private:
 
-    long numerator_;
-    long denominator_;
+    int numerator_;
+    int denominator_;
 
 public:
 
-    Fraction(long numerator, long denominator) : numerator_(numerator), denominator_(denominator)
+    Fraction(int numerator, int denominator) : numerator_(numerator), denominator_(denominator)
     {
         if (denominator == 0) {
             throw "Denominator can't be zero!";
@@ -34,32 +34,32 @@ public:
     // Boolean Operators
     bool operator <(const Fraction& fraction)
     {
-        return this->numerator_ * fraction.getDenominator() < this->denominator_ * fraction.getNumerator();
+        return (this->numerator_ * fraction.getDenominator()) < (this->denominator_ * fraction.getNumerator());
     }
 
     bool operator >(const Fraction& fraction)
     {
-        return this->numerator_ * fraction.getDenominator() > this->denominator_ * fraction.getNumerator();
+        return (this->numerator_ * fraction.getDenominator()) > (this->denominator_ * fraction.getNumerator());
     }
 
     bool operator <(const long& number)
     {
-        return (this->numerator_ / this->denominator_) < number;
+        return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) < number;
     }
 
     bool operator <=(const long& number)
     {
-        return (this->numerator_ / this->denominator_) <= number;
+        return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) <= number;
     }
 
     bool operator >(const long& number)
     {
-        return (this->numerator_ / this->denominator_) > number;
+        return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) > number;
     }
 
     Fraction* operator /(const Fraction& fraction)
     {
-        if (fraction.getNumerator() == 0) {
+        if (this->denominator_ == 0 || fraction.getNumerator() == 0) {
             return new Fraction(0, 1);
         }
 
@@ -76,12 +76,12 @@ public:
         return new Fraction((this->numerator_ * fraction.getDenominator()) + (fraction.getNumerator() * this->denominator_), this->denominator_ * fraction.getDenominator());
     }
 
-    long getNumerator() const
+    int getNumerator() const
     {
         return numerator_;
     }
 
-    long getDenominator() const
+    int getDenominator() const
     {
         return denominator_;
     }
@@ -93,15 +93,14 @@ public:
 
 private:
 
-    long gcd(long a, long b) const
+    int gcd(int a, int b) const
     {
         return b == 0 ? a : gcd(b, a % b);
     }
 
-
     void simplify()
     {
-        long gcd_ = gcd(this->numerator_, this->denominator_);
+        int gcd_ = gcd(this->numerator_, this->denominator_);
         this->denominator_ /= gcd_;
         this->numerator_   /= gcd_;
     }
