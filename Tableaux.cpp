@@ -25,6 +25,44 @@ SolveMethod Tableaux::getWhichSolveMethodApplies() const
     return PRIMAL_METHOD;
 }
 
+bool Tableaux::stepPrimal(std::string file_output_steps, std::string file_output_result)
+{
+    // Try to get a Element index to Pivot.
+    auto primal_indexes = this->getPrimalMatrixIndex();
+    if (primal_indexes[0] == -1 || primal_indexes[1] == -1) {
+        // Primal finished.
+        return false;
+    }
+
+    // Pivot primal element.
+    this->pivot(primal_indexes);
+
+    // Write matrix step on file.
+    std::string matrix_str = this->matrix_->toString();
+    File::WriteOnFile(file_output_steps, matrix_str);
+
+    return true;
+}
+
+bool Tableaux::stepDual(std::string file_output_steps, std::string file_output_result)
+{
+    // Try to get a Element index to Pivot.
+    auto dual_indexes = this->getDualMatrixIndex();
+    if (dual_indexes[0] == -1 || dual_indexes[1] == -1) {
+        // Dual finished.
+        return false;
+    }
+
+    // Pivot primal element.
+    this->pivot(dual_indexes);
+
+    // Write matrix step on file.
+    std::string matrix_str = this->matrix_->toString();
+    File::WriteOnFile(file_output_steps, matrix_str);
+
+    return true;
+}
+
 std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
 {
     std::array<int, 2> index = {-1, -1};
@@ -56,6 +94,47 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
                 if (lower > *(b_element/A_element)) {
                     lower = b_element;
                     index = {j, i};
+                }
+            }
+
+            return index;
+        }
+    }
+
+    return index;
+}
+
+std::array<int, 2> Tableaux::getDualMatrixIndex() const
+{
+    std::array<int, 2> index = {-1, -1};
+
+    // Iterate in 'b' vector elements.
+    for (int i = 1; i < matrix_->getM(); ++i) {
+
+        // Get 'b' vector element.
+        auto b_element = *matrix_->getCells()[i][matrix_->getN()-1];
+
+        // Check if 'b' is negative.
+        if (b_element < 0) {
+
+            Fraction lower (INT_MAX, 1);
+
+            // Iterate in 'c' vector elements
+            for (int j = 0; j < matrix_->getN()-1; ++j) {
+
+                // Get correspondent positive A element.
+                Fraction A_element = *matrix_->getCells()[i][j];
+                if (A_element <= 0) {
+                    continue;
+                }
+
+                // Get 'c' vector element.
+                Fraction c_element = *matrix_->getCells()[0][j];
+
+                // Find lower 'b' element divided by 'A' element.
+                if (lower > *(c_element/A_element)) {
+                    lower = c_element;
+                    index = {i, j};
                 }
             }
 
