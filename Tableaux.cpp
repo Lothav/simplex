@@ -22,18 +22,28 @@ Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_metho
 
 SolveMethod Tableaux::getWhichSolveMethodApplies() const
 {
-    // check 'c' elements. If less than zero, primal applies (with aux matrix or not).
-    for (int j = 0; j < this->matrix_->getN(); j++) {
-        if (*this->matrix_->getCells()[0][j] < 0) {
-            return PRIMAL_METHOD;
+    bool has_b_negative = false;
+    for (int i = 1; i < this->matrix_->getM(); i++) {
+        auto b_element = *this->matrix_->getCells()[i][this->matrix_->getN() - 1];
+        if (b_element < 0) {
+            has_b_negative = true;
+            break;
         }
     }
 
-    // if 'c' elements are greater than zero we have an 'b' element negative, dual applies.
-    for (int i = 0; i < this->matrix_->getM(); i++) {
-        if (*this->matrix_->getCells()[i][this->matrix_->getN() - 1] < 0) {
-            return DUAL_METHOD;
+    bool has_c_negative = false;
+    for (int j = 0; j < this->matrix_->getN()-1; j++) {
+        auto c_element = *this->matrix_->getCells()[0][j];
+        if (c_element < 0) {
+            has_c_negative = true;
+            break;
         }
+    }
+
+    if (has_b_negative && !has_c_negative) {
+        return DUAL_METHOD;
+    } else if (!has_b_negative && has_c_negative) {
+        return PRIMAL_METHOD;
     }
 
     // otherwise, default primal method.
