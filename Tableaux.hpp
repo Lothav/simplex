@@ -44,10 +44,7 @@ public:
         this->solve_method_ = this->getWhichSolveMethodApplies();
 
         if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
-            auto primal_indexes = getPrimalMatrixIndex();
-            this->pivot(primal_indexes);
-            std::string matrix_str = this->matrix_->toString();
-            File::WriteOnFile(file_output_steps, matrix_str);
+            while (stepPrimal(file_output_steps, file_output_result));
             return;
         }
 
@@ -58,6 +55,25 @@ public:
     }
 
 private:
+
+    bool stepPrimal(std::string file_output_steps, std::string file_output_result)
+    {
+        // Try to get a Element to Pivot.
+        auto primal_indexes = getPrimalMatrixIndex();
+        if (primal_indexes[0] == -1 || primal_indexes[1] == -1) {
+            // Primal finished.
+            return false;
+        }
+
+        // Pivot primal element.
+        this->pivot(primal_indexes);
+
+        // Write matrix step on file.
+        std::string matrix_str = this->matrix_->toString();
+        File::WriteOnFile(file_output_steps, matrix_str);
+
+        return true;
+    }
 
     SolveMethod getWhichSolveMethodApplies() const;
 

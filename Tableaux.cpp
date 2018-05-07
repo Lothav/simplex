@@ -26,7 +26,7 @@ SolveMethod Tableaux::getWhichSolveMethodApplies() const
 
 std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
 {
-    std::array<int, 2> index = {};
+    std::array<int, 2> index = {-1, -1};
 
     // Iterate in 'c' vector elements.
     for (int i = 0; i < matrix_->getN()-1; ++i) {
