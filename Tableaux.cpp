@@ -159,6 +159,8 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
         // Check if 'c' is negative.
         if (c_element < 0) {
 
+            Fraction lower(0, 1);
+
             // Iterate in 'b' vector elements
             for (int j = 1; j < matrix_->getM(); ++j) {
 
@@ -175,15 +177,15 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
                 }
 
                 auto b_divided_by_A = *(b_element/A_element);
-                auto index_element = *matrix_cells[index[0]][index[1]];
 
                 // Find lower 'b' element divided by 'A' element.
-                if (index == EMPTY_INDEXES || index_element > b_divided_by_A) {
+                if (index == EMPTY_INDEXES || b_divided_by_A < lower) {
                     index = {j, i};
+                    lower = b_divided_by_A;
                 }
             }
 
-            return index;
+            break;
         }
     }
 
@@ -201,6 +203,8 @@ std::array<int, 2> Tableaux::getDualMatrixIndex() const
 
         // Get 'b' vector element.
         auto b_element = *matrix_cells[i][matrix_->getN()-1];
+
+        Fraction lower(0, 1);
 
         // Check if 'b' is negative.
         if (b_element < 0) {
@@ -221,15 +225,15 @@ std::array<int, 2> Tableaux::getDualMatrixIndex() const
                 }
 
                 auto c_divided_by_A = *(*c_element / *(A_element*(-1)));
-                auto index_element = *matrix_cells[index[0]][index[1]];
 
                 // Find lower 'b' element divided by 'A' element.
-                if (index == EMPTY_INDEXES ||  index_element > c_divided_by_A) {
+                if (index == EMPTY_INDEXES || c_divided_by_A < lower) {
                     index = {i, j};
+                    lower = c_divided_by_A;
                 }
             }
 
-            return index;
+            break;
         }
     }
 
