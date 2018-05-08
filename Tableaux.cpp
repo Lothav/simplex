@@ -21,31 +21,39 @@ Tableaux::Tableaux(long long m, long long n, const std::vector<long long> &cells
 
 SolveMethod Tableaux::getWhichSolveMethodApplies() const
 {
+    auto matrix_cells = this->matrix_->getCells();
+
+    // Check if has negative 'b' element.
     bool has_b_negative = false;
     for (int i = 1; i < this->matrix_->getM(); i++) {
-        auto b_element = *this->matrix_->getCells()[i][this->matrix_->getN() - 1];
+        auto b_element = *matrix_cells[i][this->matrix_->getN() - 1];
         if (b_element < 0) {
             has_b_negative = true;
             break;
         }
     }
 
+    // Check if has negative 'c' element.
     bool has_c_negative = false;
     for (int j = 0; j < this->matrix_->getN()-1; j++) {
-        auto c_element = *this->matrix_->getCells()[0][j];
+        auto c_element = *matrix_cells[0][j];
         if (c_element < 0) {
             has_c_negative = true;
             break;
         }
     }
 
+    // If has 'b' negative and doesn't has 'c' negative: Dual method.
     if (has_b_negative && !has_c_negative) {
         return DUAL_METHOD;
-    } else if (!has_b_negative && has_c_negative) {
+    }
+
+    // If doesn't has 'b' negative and has 'c' negative: Primal method.
+    if (!has_b_negative && has_c_negative) {
         return PRIMAL_METHOD;
     }
 
-    // otherwise, default primal method.
+    // Otherwise, use aux matrix and Primal method.
     return PRIMAL_AUX_METHOD;
 }
 
@@ -146,7 +154,7 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
     for (int i = 0; i < matrix_->getN()-1; ++i) {
 
         // Get 'c' vector element.
-        auto c_element = *matrix_->getCells()[0][i];
+        auto c_element = *matrix_cells[0][i];
 
         // Check if 'c' is negative.
         if (c_element < 0) {
