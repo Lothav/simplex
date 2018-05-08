@@ -47,7 +47,7 @@ SolveMethod Tableaux::getWhichSolveMethodApplies() const
     }
 
     // otherwise, default primal method.
-    return PRIMAL_METHOD;
+    return PRIMAL_AUX_METHOD;
 }
 
 void Tableaux::solve(std::string file_output_steps, std::string file_output_result)
@@ -63,6 +63,32 @@ void Tableaux::solve(std::string file_output_steps, std::string file_output_resu
     if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
         std::cout << "Using Dual method." << std::endl;
         while(stepDual(file_output_steps, file_output_result));
+        return;
+    }
+
+    if (this->solve_method_ == SolveMethod::PRIMAL_AUX_METHOD) {
+        std::cout << "Using Aux Primal method." << std::endl;
+
+        // Multiply lines where 'b' < 0 to -1.
+        for (int i = 1; i < this->matrix_->getM(); ++i) {
+            auto matrix_cells = this->matrix_->getCells();
+            if (*matrix_cells[i][this->matrix_->getN()-1] < 0) {
+                for (int j = 0; j < this->matrix_->getN(); ++j) {
+                    this->matrix_->updateCell(i, j, *matrix_cells[i][j] * -1);
+                }
+            }
+        }
+
+        for (int k = 0; k < this->matrix_->getN()-1; ++k) {
+            this->matrix_->updateCell(0, k, new Fraction(0, 1));
+        }
+        for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-this->matrix_->getM()-2; --k) {
+            this->matrix_->updateCell(0, k, new Fraction(1, 1));
+        }
+
+        this->matrix_->putInFPI();
+
+        while (stepPrimal(file_output_steps, file_output_result));
         return;
     }
 }

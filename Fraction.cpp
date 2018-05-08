@@ -44,6 +44,12 @@ bool Fraction::operator >=(const long long& number)
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) >= number;
 }
 
+bool Fraction::operator ==(const long long& number)
+{
+    return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) == number;
+
+}
+
 bool Fraction::operator >(const long long& number)
 {
     return (static_cast<float>(this->numerator_) / static_cast<float>(this->denominator_)) > number;

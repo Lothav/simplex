@@ -28,6 +28,8 @@ public:
 
     bool operator >(const long long& number);
 
+    bool operator ==(const long long& number);
+
     Fraction* operator *(const long long& number);
 
     bool operator <(const Fraction& fraction);

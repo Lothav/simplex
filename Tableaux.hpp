@@ -11,7 +11,8 @@
 
 enum SolveMethod {
     DUAL_METHOD,
-    PRIMAL_METHOD
+    PRIMAL_METHOD,
+    PRIMAL_AUX_METHOD
 };
 
 class Tableaux
