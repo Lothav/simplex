@@ -15,6 +15,8 @@ enum SolveMethod {
     PRIMAL_AUX_METHOD
 };
 
+const std::array<int, 2> EMPTY_INDEXES = {-1, -1};
+
 class Tableaux
 {
 

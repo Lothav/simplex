@@ -30,11 +30,11 @@ public:
 
     bool operator ==(const long long& number);
 
-    Fraction* operator *(const long long& number);
-
     bool operator <(const Fraction& fraction);
 
     bool operator >(const Fraction& fraction);
+
+    Fraction* operator *(const long long& number);
 
     Fraction* operator *(const Fraction& fraction);
 

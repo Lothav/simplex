@@ -2,7 +2,6 @@
 // Created by luiz0tavio on 5/5/18.
 //
 
-#include <climits>
 #include "Tableaux.hpp"
 
 Tableaux::Tableaux(long long m, long long n, const std::vector<long long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
@@ -97,7 +96,7 @@ bool Tableaux::stepPrimal(std::string file_output_steps, std::string file_output
 {
     // Try to get a Element index to Pivot.
     auto primal_indexes = this->getPrimalMatrixIndex();
-    if (primal_indexes[0] == -1 || primal_indexes[1] == -1) {
+    if (primal_indexes == EMPTY_INDEXES) {
         // Primal finished.
         return false;
     }
@@ -116,7 +115,7 @@ bool Tableaux::stepDual(std::string file_output_steps, std::string file_output_r
 {
     // Try to get a Element index to Pivot.
     auto dual_indexes = this->getDualMatrixIndex();
-    if (dual_indexes[0] == -1 || dual_indexes[1] == -1) {
+    if (dual_indexes == EMPTY_INDEXES) {
         // Dual finished.
         return false;
     }
@@ -139,7 +138,9 @@ bool Tableaux::stepDual(std::string file_output_steps, std::string file_output_r
 
 std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
 {
-    std::array<int, 2> index = {-1, -1};
+    std::array<int, 2> index = EMPTY_INDEXES;
+
+    auto matrix_cells = matrix_->getCells();
 
     // Iterate in 'c' vector elements.
     for (int i = 0; i < matrix_->getN()-1; ++i) {
@@ -150,28 +151,26 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
         // Check if 'c' is negative.
         if (c_element < 0) {
 
-            Fraction lower (INT_MAX, 1);
-
             // Iterate in 'b' vector elements
             for (int j = 1; j < matrix_->getM(); ++j) {
 
                 // Get correspondent positive A element.
-                Fraction A_element = *matrix_->getCells()[j][i];
+                Fraction A_element = *matrix_cells[j][i];
                 if (A_element <= 0) {
                     continue;
                 }
 
                 // Get 'b' vector element.
-                Fraction b_element = *matrix_->getCells()[j][matrix_->getN()-1];
+                Fraction b_element = *matrix_cells[j][matrix_->getN()-1];
                 if (b_element <= 0) {
                     continue;
                 }
 
                 auto b_divided_by_A = *(b_element/A_element);
+                auto index_element = *matrix_cells[index[0]][index[1]];
 
                 // Find lower 'b' element divided by 'A' element.
-                if (index[0] == -1 || lower > b_divided_by_A) {
-                    lower = b_divided_by_A;
+                if (index == EMPTY_INDEXES || index_element > b_divided_by_A) {
                     index = {j, i};
                 }
             }
@@ -185,39 +184,39 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
 
 std::array<int, 2> Tableaux::getDualMatrixIndex() const
 {
-    std::array<int, 2> index = {-1, -1};
+    std::array<int, 2> index = EMPTY_INDEXES;
+
+    auto matrix_cells = matrix_->getCells();
 
     // Iterate in 'b' vector elements.
     for (int i = 1; i < matrix_->getM(); ++i) {
 
         // Get 'b' vector element.
-        auto b_element = *matrix_->getCells()[i][matrix_->getN()-1];
+        auto b_element = *matrix_cells[i][matrix_->getN()-1];
 
         // Check if 'b' is negative.
         if (b_element < 0) {
-
-            Fraction lower (INT_MAX, 1);
 
             // Iterate in 'c' vector elements
             for (int j = 0; j < matrix_->getN()-1; ++j) {
 
                 // Get correspondent positive A element.
-                Fraction A_element = *matrix_->getCells()[i][j];
+                Fraction A_element = *matrix_cells[i][j];
                 if (A_element >= 0) {
                     continue;
                 }
 
                 // Get 'c' vector element.
-                Fraction* c_element = matrix_->getCells()[0][j];
+                Fraction* c_element = matrix_cells[0][j];
                 if (c_element <= 0) {
                     continue;
                 }
 
                 auto c_divided_by_A = *(*c_element / *(A_element*(-1)));
+                auto index_element = *matrix_cells[index[0]][index[1]];
 
                 // Find lower 'b' element divided by 'A' element.
-                if (index[0] == -1 || lower > c_divided_by_A) {
-                    lower = c_divided_by_A;
+                if (index == EMPTY_INDEXES ||  index_element > c_divided_by_A) {
                     index = {i, j};
                 }
             }
