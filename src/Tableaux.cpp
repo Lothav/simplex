@@ -4,9 +4,15 @@
 
 #include "Tableaux.hpp"
 
-Tableaux::Tableaux(long long m, long long n, const std::vector<long long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
+Simplex::Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
 {
-    matrix_ = new Matrix(m, n, cells);
+    std::vector<BigInt> bi;
+    for(auto bi_c: cells) {
+        BigInt a = bi_c;
+        bi.push_back(a);
+    }
+
+    matrix_ = new Matrix(m, n, bi);
 
     if (!matrix_->isInFPI()) {
         matrix_->putInFPI();
@@ -19,7 +25,7 @@ Tableaux::Tableaux(long long m, long long n, const std::vector<long long> &cells
     }
 }
 
-SolveMethod Tableaux::getWhichSolveMethodApplies() const
+SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
 {
     auto matrix_cells = this->matrix_->getCells();
 
@@ -57,7 +63,7 @@ SolveMethod Tableaux::getWhichSolveMethodApplies() const
     return PRIMAL_AUX_METHOD;
 }
 
-void Tableaux::solve(std::string file_output_steps, std::string file_output_result)
+void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_output_result)
 {
     this->solve_method_ = this->getWhichSolveMethodApplies();
 
@@ -100,7 +106,7 @@ void Tableaux::solve(std::string file_output_steps, std::string file_output_resu
     }
 }
 
-bool Tableaux::stepPrimal(std::string file_output_steps, std::string file_output_result)
+bool Simplex::Tableaux::stepPrimal(std::string file_output_steps, std::string file_output_result)
 {
     // Try to get a Element index to Pivot.
     auto primal_indexes = this->getPrimalMatrixIndex();
@@ -119,7 +125,7 @@ bool Tableaux::stepPrimal(std::string file_output_steps, std::string file_output
     return true;
 }
 
-bool Tableaux::stepDual(std::string file_output_steps, std::string file_output_result)
+bool Simplex::Tableaux::stepDual(std::string file_output_steps, std::string file_output_result)
 {
     // Try to get a Element index to Pivot.
     auto dual_indexes = this->getDualMatrixIndex();
@@ -139,12 +145,12 @@ bool Tableaux::stepDual(std::string file_output_steps, std::string file_output_r
 
     // Write matrix step on file.
     std::string matrix_str = this->matrix_->toString();
-    File::WriteOnFile(file_output_steps, matrix_str);
+    Simplex::File::WriteOnFile(file_output_steps, matrix_str);
 
     return true;
 }
 
-std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
+std::array<int, 2> Simplex::Tableaux::getPrimalMatrixIndex() const
 {
     std::array<int, 2> index = EMPTY_INDEXES;
 
@@ -166,15 +172,12 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
 
                 // Get correspondent positive A element.
                 Fraction A_element = *matrix_cells[j][i];
-                if (A_element <= 0) {
+                if (A_element.getFloatValue() <= 0) {
                     continue;
                 }
 
                 // Get 'b' vector element.
                 Fraction b_element = *matrix_cells[j][matrix_->getN()-1];
-                if (b_element <= 0) {
-                    continue;
-                }
 
                 auto b_divided_by_A = *(b_element/A_element);
 
@@ -192,7 +195,7 @@ std::array<int, 2> Tableaux::getPrimalMatrixIndex() const
     return index;
 }
 
-std::array<int, 2> Tableaux::getDualMatrixIndex() const
+std::array<int, 2> Simplex::Tableaux::getDualMatrixIndex() const
 {
     std::array<int, 2> index = EMPTY_INDEXES;
 
@@ -240,7 +243,7 @@ std::array<int, 2> Tableaux::getDualMatrixIndex() const
     return index;
 }
 
-void Tableaux::pivot(const std::array<int, 2>& indexes)
+void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes)
 {
     auto matrix_cells = this->matrix_->getCells();
 
@@ -264,13 +267,15 @@ void Tableaux::pivot(const std::array<int, 2>& indexes)
         }
 
         // Get the correspondent line pivot.
-        auto multiplier = *matrix_cells[i][indexes[1]];
+        Fraction multiplier = *matrix_cells[i][indexes[1]];
 
         // Loop through columns elements of 'i' line.
         for (int j = 0; j < this->matrix_->getN(); ++j) {
 
+            auto cell_multiplier = (*matrix_cells[indexes[0]][j] * multiplier);
+
             // Current cell - (correspondent line pivot column * multiplier)
-            auto new_cell = *matrix_cells[i][j] - *(*matrix_cells[indexes[0]][j] * multiplier);
+            auto new_cell = *matrix_cells[i][j] - *cell_multiplier;
 
             // Update current cell with the new calculated cell.
             this->matrix_->updateCell(i, j, new_cell);

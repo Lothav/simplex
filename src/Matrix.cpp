@@ -4,7 +4,7 @@
 
 #include "Matrix.hpp"
 
-Matrix::Matrix(long m, long n, const std::vector<long long> &cells): m_(m), n_(n), in_fpi_(false)
+Simplex::Matrix::Matrix(long m, long n, const std::vector<BigInt> &cells): m_(m), n_(n), in_fpi_(false)
 {
     int i, j;
     for (i = 0 ; i < m_; i++) {
@@ -15,7 +15,7 @@ Matrix::Matrix(long m, long n, const std::vector<long long> &cells): m_(m), n_(n
     }
 }
 
-void Matrix::putInFPI()
+void Simplex::Matrix::putInFPI()
 {
     if (this->isInFPI()) {
         return;
@@ -50,7 +50,7 @@ void Matrix::putInFPI()
     this->in_fpi_ = true;
 }
 
-void Matrix::updateCell(int i, int j, Fraction* cell)
+void Simplex::Matrix::updateCell(int i, int j, Fraction* cell)
 {
     if (i >= this->m_) {
         std::cerr << "Error trying update matrix. Invalid line index " << i << std::endl;
@@ -65,13 +65,13 @@ void Matrix::updateCell(int i, int j, Fraction* cell)
     this->cells_[i][j] = cell;
 }
 
-std::string Matrix::toString() const
+std::string Simplex::Matrix::toString() const
 {
     std::string matrix_string = "[";
     for (int i = 0; i < this->getM(); ++i) {
         matrix_string += "[";
         for (int j = 0; j < this->getN(); ++j) {
-            float value = this->cells_[i][j]->getFloatValue();
+            long double value = this->cells_[i][j]->getFloatValue();
             matrix_string += std::to_string(value);
             if(j != this->getN()-1){
                 matrix_string += ", ";
@@ -87,22 +87,22 @@ std::string Matrix::toString() const
     return matrix_string;
 }
 
-bool Matrix::isInFPI() const
+bool Simplex::Matrix::isInFPI() const
 {
     return this->in_fpi_;
 }
 
-long Matrix::getM() const
+long Simplex::Matrix::getM() const
 {
     return m_;
 }
 
-long Matrix::getN() const
+long Simplex::Matrix::getN() const
 {
     return n_;
 }
 
-std::vector<std::vector<Fraction*>> Matrix::getCells() const
+std::vector<std::vector<Simplex::Fraction*>> Simplex::Matrix::getCells() const
 {
     return cells_;
 }

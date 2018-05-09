@@ -13,9 +13,9 @@ int main(int argc, char** argv)
 {
     std::vector<std::string> file_data;
     if (argc > 1) {
-        file_data = File::GetFileData(argv[1]);
+        file_data = Simplex::File::GetFileData(argv[1]);
     } else {
-        file_data = File::GetStdInData();
+        file_data = Simplex::File::GetStdInData();
     }
 
     if (file_data.size() != 3) {
@@ -29,10 +29,10 @@ int main(int argc, char** argv)
 
     auto matrix_m = std::stoi (file_data[0]);
     auto matrix_n = std::stoi (file_data[1]);
-    auto matrix_cells = File::GetIntsFromStringFile(file_data[2]);
+    auto matrix_cells = Simplex::File::GetIntsFromStringFile(file_data[2]);
 
     // Generate matrix from input file.
-    auto tableaux = new Tableaux(matrix_m+1, matrix_n+1, matrix_cells);
+    auto tableaux = new Simplex::Tableaux(matrix_m+1, matrix_n+1, matrix_cells);
     tableaux->solve("pivoteamento.txt", "conclusao.txt");
 
     return EXIT_SUCCESS;

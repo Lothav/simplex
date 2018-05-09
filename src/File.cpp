@@ -4,7 +4,7 @@
 
 #include "File.hpp"
 
-std::vector<std::string> File::GetFileData(std::string path)
+std::vector<std::string> Simplex::File::GetFileData(std::string path)
 {
     std::vector<std::string> file_data = {};
 
@@ -20,12 +20,12 @@ std::vector<std::string> File::GetFileData(std::string path)
     return file_data;
 }
 
-std::vector<std::string> File::GetStdInData()
+std::vector<std::string> Simplex::File::GetStdInData()
 {
     return readStream(std::cin);
 }
 
-void File::WriteOnFile(std::string path, std::string data)
+void Simplex::File::WriteOnFile(std::string path, std::string data)
 {
     std::ofstream out_file;
     out_file.open(path, std::ios::app);
@@ -33,9 +33,9 @@ void File::WriteOnFile(std::string path, std::string data)
     out_file.close();
 }
 
-std::vector<long long> File::GetIntsFromStringFile(std::string data_string)
+std::vector<long> Simplex::File::GetIntsFromStringFile(std::string data_string)
 {
-    std::vector<long long> data_int = {};
+    std::vector<long> data_int = {};
 
     std::regex r("(\\+|-)?[[:digit:]]+");
     std::smatch m;
@@ -49,7 +49,7 @@ std::vector<long long> File::GetIntsFromStringFile(std::string data_string)
 }
 
 
-std::vector<std::string> File::readStream(std::istream& input_stream)
+std::vector<std::string> Simplex::File::readStream(std::istream& input_stream)
 {
     std::vector<std::string> lines;
 
