@@ -15,7 +15,7 @@ Simplex::Fraction::Fraction(BigInt numerator, BigInt denominator) : numerator_(n
         numerator_   *= -1;
     }
 
-    simplify();
+    this->simplify();
 }
 
 Simplex::Fraction* Simplex::Fraction::operator *(const Fraction& fraction)
@@ -23,7 +23,6 @@ Simplex::Fraction* Simplex::Fraction::operator *(const Fraction& fraction)
     return new Fraction(this->numerator_ * fraction.getNumerator(), this->denominator_ * fraction.getDenominator());
 }
 
-// Boolean Operators
 bool Simplex::Fraction::operator <(const Fraction& fraction)
 {
     return (this->numerator_ * fraction.getDenominator()) < (this->denominator_ * fraction.getNumerator());
@@ -34,30 +33,29 @@ bool Simplex::Fraction::operator >(const Fraction& fraction)
     return (this->numerator_ * fraction.getDenominator()) > (this->denominator_ * fraction.getNumerator());
 }
 
-bool Simplex::Fraction::operator <(const BigInt& number)
+bool Simplex::Fraction::operator <(const long double& number)
 {
-    return this->numerator_ * this->denominator_ < number;
+    return this->getFloatValue() < number;
 }
 
-bool Simplex::Fraction::operator <=(const BigInt& number)
+bool Simplex::Fraction::operator <=(const long double& number)
 {
-    return (this->numerator_ / this->denominator_) <= number;
+    return this->getFloatValue() <= number;
 }
 
-bool Simplex::Fraction::operator >=(const BigInt& number)
+bool Simplex::Fraction::operator >=(const long double& number)
 {
-    return (this->numerator_ / this->denominator_) >= number;
+    return this->getFloatValue() >= number;
 }
 
-bool Simplex::Fraction::operator ==(const BigInt& number)
+bool Simplex::Fraction::operator ==(const long double& number)
 {
-    return (this->numerator_ / this->denominator_) == number;
-
+    return this->getFloatValue() == number;
 }
 
-bool Simplex::Fraction::operator >(const BigInt& number)
+bool Simplex::Fraction::operator >(const long double& number)
 {
-    return (this->numerator_ / this->denominator_) > number;
+    return this->getFloatValue() > number;
 }
 
 Simplex::Fraction* Simplex::Fraction::operator /(const Fraction& fraction)

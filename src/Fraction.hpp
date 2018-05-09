@@ -25,15 +25,15 @@ namespace Simplex {
         Fraction(BigInt numerator, BigInt denominator);
 
         // Boolean Operators
-        bool operator <(const BigInt& number);
+        bool operator <(const long double& number);
 
-        bool operator <=(const BigInt& number);
+        bool operator <=(const long double& number);
 
-        bool operator >=(const BigInt& number);
+        bool operator >=(const long double& number);
 
-        bool operator >(const BigInt& number);
+        bool operator >(const long double& number);
 
-        bool operator ==(const BigInt& number);
+        bool operator ==(const long double& number);
 
         bool operator <(const Fraction& fraction);
 

@@ -172,7 +172,7 @@ std::array<int, 2> Simplex::Tableaux::getPrimalMatrixIndex() const
 
                 // Get correspondent positive A element.
                 Fraction A_element = *matrix_cells[j][i];
-                if (A_element.getFloatValue() <= 0) {
+                if (A_element <= 0) {
                     continue;
                 }
 
