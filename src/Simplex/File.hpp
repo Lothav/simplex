@@ -12,9 +12,10 @@
 #include <fstream>
 #include <regex>
 
-namespace Simplex{
-
-    class File {
+namespace Simplex
+{
+    class File
+    {
 
     public:
 

@@ -94,19 +94,24 @@ BigInt Simplex::Fraction::getDenominator() const
 
 long double Simplex::Fraction::getFloatValue() const
 {
-    int division = 2;
+    // We want to cast our division to 'long double'.
+    // But it's possible only with primitive types (not BigInt).
+    // So, we need check if both numerator and denominator fits into a 'long long int' (biggest type).
+    // If doesn't, truncate both until it fits!
+
+    int truncate_rate = 2;
 
     auto greater = this->numerator_ > this->denominator_ ? this->numerator_ : this->denominator_;
     auto lower   = this->numerator_ < this->denominator_ ? this->numerator_ : this->denominator_;
 
-    while (greater > BigInt(LONG_LONG_MAX)) {
-        greater /= division;
-        lower /= division;
+    while (greater > BigInt(LLONG_MAX)) {
+        greater /= truncate_rate;
+        lower /= truncate_rate;
     }
 
-    while (lower < BigInt(-LONG_LONG_MAX)) {
-        greater /= division;
-        lower /= division;
+    while (lower < BigInt(LLONG_MIN)) {
+        greater /= truncate_rate;
+        lower /= truncate_rate;
     }
 
     if (this->numerator_ > this->denominator_) {

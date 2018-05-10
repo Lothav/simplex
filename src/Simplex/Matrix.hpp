@@ -9,9 +9,10 @@
 #include <vector>
 #include <iostream>
 
-namespace Simplex {
-
-    class Matrix {
+namespace Simplex
+{
+    class Matrix
+    {
 
     private:
 

@@ -5,8 +5,8 @@
 #ifndef SIMPLEX_TABLEAUX_HPP
 #define SIMPLEX_TABLEAUX_HPP
 
-#include "Matrix.hpp"
 #include <array>
+#include "Matrix.hpp"
 #include "File.hpp"
 
 enum SolveMethod {

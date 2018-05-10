@@ -7,7 +7,7 @@
 #include <cstring>
 #include <vector>
 #include <regex>
-#include "Tableaux.hpp"
+#include "Simplex/Tableaux.hpp"
 
 int main(int argc, char** argv)
 {

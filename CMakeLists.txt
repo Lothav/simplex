@@ -3,13 +3,13 @@ project (Simplex)
 # add_definitions(-DDEBUG)
 add_executable (simplex
         src/main.cpp
-        src/File.cpp
-        src/File.hpp
-        src/Tableaux.cpp
-        src/Tableaux.hpp
-        src/Matrix.cpp
-        src/Matrix.hpp
-        src/Fraction.cpp
-        src/Fraction.hpp
+        src/Simplex/File.cpp
+        src/Simplex/File.hpp
+        src/Simplex/Tableaux.cpp
+        src/Simplex/Tableaux.hpp
+        src/Simplex/Matrix.cpp
+        src/Simplex/Matrix.hpp
+        src/Simplex/Fraction.cpp
+        src/Simplex/Fraction.hpp
         external/Inifity.hpp
         )
