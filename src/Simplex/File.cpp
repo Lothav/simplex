@@ -22,6 +22,7 @@ std::vector<std::string> Simplex::File::GetFileData(std::string path)
 
 std::vector<std::string> Simplex::File::GetStdInData()
 {
+    std::cout << "Not received a file as parameter. Trying to get it from stdin" << std::endl;
     return readStream(std::cin);
 }
 
@@ -47,7 +48,6 @@ std::vector<long> Simplex::File::GetIntsFromStringFile(std::string data_string)
 
     return data_int;
 }
-
 
 std::vector<std::string> Simplex::File::readStream(std::istream& input_stream)
 {

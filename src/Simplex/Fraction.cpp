@@ -128,7 +128,7 @@ BigInt Simplex::Fraction::gcd(const BigInt& a, const BigInt& b) const
 
 BigInt Simplex::Fraction::gcm(const BigInt& a, const BigInt& b) const
 {
-    return (a*b)/gcd(a,b);
+    return (a * b) / gcd(a, b);
 }
 
 void Simplex::Fraction::simplify()

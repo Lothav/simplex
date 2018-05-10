@@ -68,21 +68,27 @@ void Simplex::Matrix::updateCell(int i, int j, Fraction* cell)
 std::string Simplex::Matrix::toString() const
 {
     std::string matrix_string = "[";
+
     for (int i = 0; i < this->getM(); ++i) {
+
         matrix_string += "[";
+
         for (int j = 0; j < this->getN(); ++j) {
             long double value = this->cells_[i][j]->getFloatValue();
             matrix_string += std::to_string(value);
-            if(j != this->getN()-1){
+            if (j != this->getN()-1) {
                 matrix_string += ", ";
             }
         }
+
         matrix_string += "]";
-        if(i != this->getM()-1){
-            matrix_string += ", \n";
+
+        if (i != this->getM()-1) {
+            matrix_string += ", ";
         }
     }
-    matrix_string += "]\n";
+
+    matrix_string += "]";
 
     return matrix_string;
 }
