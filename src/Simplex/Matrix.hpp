@@ -20,8 +20,6 @@ namespace Simplex
         long n_;
         std::vector<std::vector<Fraction*>> cells_;
 
-        bool in_fpi_;
-
     public:
 
         Matrix(long m, long n, const std::vector<BigInt>& cells);
@@ -30,11 +28,11 @@ namespace Simplex
 
         long getN() const;
 
+        void setM(long m);
+
+        void setN(long n);
+
         std::vector<std::vector<Fraction*>> getCells() const;
-
-        void putInFPI();
-
-        bool isInFPI() const;
 
         void updateCell(int i, int j, Fraction* cell);
 

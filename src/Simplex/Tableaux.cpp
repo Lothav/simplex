@@ -14,15 +14,41 @@ Simplex::Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : so
 
     matrix_ = new Matrix(m, n, bi);
 
-    if (!matrix_->isInFPI()) {
-        matrix_->putInFPI();
-    }
+    this->addSlackVariables();
 
     // Iterate in first matrix column. Set all elements to negative.
     for (int j = 0; j < matrix_->getN(); ++j) {
         auto element = matrix_->getCells()[0][j];
         matrix_->updateCell(0, j, new Fraction(element->getNumerator() * -1, element->getDenominator()));
     }
+}
+
+void Simplex::Tableaux::addSlackVariables()
+{
+    // Insert [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]] vector like in matrix.
+    // It corresponds to slack variables (before 'b' vector).
+    // First line we will get our certifies.
+
+    // Iterate lines.
+    for (int i = 0; i < this->matrix_->getM(); ++i) {
+
+        // Iterate columns.
+        for (int j = 0; j < this->matrix_->getM()-1; ++j) {
+
+            // If line is 0, all columns is 0.
+            // If line != 0, if column+1 == line then 1 else 0.
+            long slack_var_num = ((i != 0) && (i == j+1)) ? 1 : 0;
+
+            // Generate slack variable fraction.
+            auto slack_var_element = new Fraction(slack_var_num, 1);
+
+            // Insert it straight before 'b' element.
+            this->matrix_->getCells()[i].insert(matrix_->getCells()[i].end() - 1, slack_var_element);
+        }
+    }
+
+    // We add some columns, so, increment n value as much inserts by line (nested loop above).
+    this->matrix_->setN(this->matrix_->getN() + this->matrix_->getM() - 1);
 }
 
 SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
@@ -68,19 +94,19 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
     this->solve_method_ = this->getWhichSolveMethodApplies();
 
     if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
-        std::cout << "Using Primal method." << std::endl;
+        std::cout << "Using Primal method..." << std::endl;
         while (stepPrimal(file_output_steps, file_output_result));
         return;
     }
 
     if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
-        std::cout << "Using Dual method." << std::endl;
+        std::cout << "Using Dual method..." << std::endl;
         while(stepDual(file_output_steps, file_output_result));
         return;
     }
 
     if (this->solve_method_ == SolveMethod::PRIMAL_AUX_METHOD) {
-        std::cout << "Using Aux Primal method." << std::endl;
+        std::cout << "Using Aux Primal method..." << std::endl;
 
         // Multiply lines where 'b' < 0 to -1.
         for (int i = 1; i < this->matrix_->getM(); ++i) {
@@ -99,8 +125,6 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
             this->matrix_->updateCell(0, k, new Fraction(1, 1));
         }
 
-        this->matrix_->putInFPI();
-
         while (stepPrimal(file_output_steps, file_output_result));
         return;
     }
@@ -109,7 +133,7 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
 bool Simplex::Tableaux::stepPrimal(std::string file_output_steps, std::string file_output_result)
 {
     // Try to get a Element index to Pivot.
-    auto primal_indexes = this->getPrimalMatrixIndex();
+    auto primal_indexes = this->getPrimalIndex();
     if (primal_indexes == EMPTY_INDEXES) {
         // Primal finished.
         return false;
@@ -128,7 +152,7 @@ bool Simplex::Tableaux::stepPrimal(std::string file_output_steps, std::string fi
 bool Simplex::Tableaux::stepDual(std::string file_output_steps, std::string file_output_result)
 {
     // Try to get a Element index to Pivot.
-    auto dual_indexes = this->getDualMatrixIndex();
+    auto dual_indexes = this->getDualIndex();
     if (dual_indexes == EMPTY_INDEXES) {
         // Dual finished.
         return false;
@@ -150,7 +174,7 @@ bool Simplex::Tableaux::stepDual(std::string file_output_steps, std::string file
     return true;
 }
 
-std::array<int, 2> Simplex::Tableaux::getPrimalMatrixIndex() const
+std::array<int, 2> Simplex::Tableaux::getPrimalIndex() const
 {
     std::array<int, 2> index = EMPTY_INDEXES;
 
@@ -195,7 +219,7 @@ std::array<int, 2> Simplex::Tableaux::getPrimalMatrixIndex() const
     return index;
 }
 
-std::array<int, 2> Simplex::Tableaux::getDualMatrixIndex() const
+std::array<int, 2> Simplex::Tableaux::getDualIndex() const
 {
     std::array<int, 2> index = EMPTY_INDEXES;
 

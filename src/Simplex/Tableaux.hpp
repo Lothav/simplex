@@ -35,11 +35,13 @@ namespace Simplex {
 
     private:
 
+        void addSlackVariables();
+
         SolveMethod getWhichSolveMethodApplies() const;
 
-        std::array<int, 2> getPrimalMatrixIndex() const;
+        std::array<int, 2> getPrimalIndex() const;
 
-        std::array<int, 2> getDualMatrixIndex() const;
+        std::array<int, 2> getDualIndex() const;
 
         bool stepPrimal(std::string file_output_steps, std::string file_output_result);
 
