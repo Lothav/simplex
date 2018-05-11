@@ -30,6 +30,11 @@ void Simplex::Matrix::updateCell(int i, int j, Fraction* cell)
     this->cells_[i][j] = cell;
 }
 
+void Simplex::Matrix::insertCell(long i, std::vector<Fraction *>::const_iterator j, Fraction* cell)
+{
+    this->cells_[i].insert(this->cells_[i].end() - 1 , cell);
+}
+
 std::string Simplex::Matrix::toString() const
 {
     std::string matrix_string = "[";
@@ -49,7 +54,7 @@ std::string Simplex::Matrix::toString() const
         matrix_string += "]";
 
         if (i != this->getM()-1) {
-            matrix_string += ", ";
+            matrix_string += ", \n";
         }
     }
 

@@ -30,7 +30,7 @@ void Simplex::File::WriteOnFile(std::string path, std::string data)
 {
     std::ofstream out_file;
     out_file.open(path, std::ios::app);
-    out_file << data << "\n";
+    out_file << data << "\n\n";
     out_file.close();
 }
 

@@ -36,6 +36,8 @@ namespace Simplex
 
         void updateCell(int i, int j, Fraction* cell);
 
+        void insertCell(long i, std::vector<Fraction *>::const_iterator j, Fraction* cell);
+
         std::string toString() const;
 
     };

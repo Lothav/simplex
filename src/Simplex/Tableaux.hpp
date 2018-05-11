@@ -37,6 +37,8 @@ namespace Simplex {
 
         void addSlackVariables();
 
+        void putInPFI();
+
         SolveMethod getWhichSolveMethodApplies() const;
 
         std::array<int, 2> getPrimalIndex() const;

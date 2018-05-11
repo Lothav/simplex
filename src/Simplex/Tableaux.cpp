@@ -37,18 +37,51 @@ void Simplex::Tableaux::addSlackVariables()
 
             // If line is 0, all columns is 0.
             // If line != 0, if column+1 == line then 1 else 0.
-            long slack_var_num = ((i != 0) && (i == j+1)) ? 1 : 0;
+            long slack_var_num = ((i != 0) && (i == j + 1)) ? 1 : 0;
 
             // Generate slack variable fraction.
             auto slack_var_element = new Fraction(slack_var_num, 1);
 
             // Insert it straight before 'b' element.
-            this->matrix_->getCells()[i].insert(matrix_->getCells()[i].end() - 1, slack_var_element);
+            this->matrix_->insertCell(i, matrix_->getCells()[i].begin(), slack_var_element);
         }
     }
 
     // We add some columns, so, increment n value as much inserts by line (nested loop above).
     this->matrix_->setN(this->matrix_->getN() + this->matrix_->getM() - 1);
+}
+
+void Simplex::Tableaux::putInPFI()
+{
+    // Search for lines with negative 'b' element.
+    for (int i = 1; i < this->matrix_->getM(); ++i) {
+        auto matrix_cells = this->matrix_->getCells();
+        if (*matrix_cells[i][this->matrix_->getN()-1] < 0) {
+            for (int j = 0; j < this->matrix_->getN(); ++j) {
+                this->matrix_->updateCell(i, j, *matrix_cells[i][j] * -1);
+            }
+        }
+    }
+
+    this->addSlackVariables();
+
+    for (int k = 0; k < this->matrix_->getN()-1; ++k) {
+        this->matrix_->updateCell(0, k, new Fraction(0, 1));
+    }
+
+    for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
+        this->matrix_->updateCell(0, k, new Fraction(1, 1));
+    }
+
+    for (int i = 1; i < this->matrix_->getM(); ++i) {
+        for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
+            auto matrix_cells = this->matrix_->getCells();
+            if (*matrix_cells[i][k] == 1 || *matrix_cells[i][k] == -1) {
+                this->pivot({i, k});
+            }
+        }
+    }
+
 }
 
 SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
@@ -108,22 +141,7 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
     if (this->solve_method_ == SolveMethod::PRIMAL_AUX_METHOD) {
         std::cout << "Using Aux Primal method..." << std::endl;
 
-        // Multiply lines where 'b' < 0 to -1.
-        for (int i = 1; i < this->matrix_->getM(); ++i) {
-            auto matrix_cells = this->matrix_->getCells();
-            if (*matrix_cells[i][this->matrix_->getN()-1] < 0) {
-                for (int j = 0; j < this->matrix_->getN(); ++j) {
-                    this->matrix_->updateCell(i, j, *matrix_cells[i][j] * -1);
-                }
-            }
-        }
-
-        for (int k = 0; k < this->matrix_->getN()-1; ++k) {
-            this->matrix_->updateCell(0, k, new Fraction(0, 1));
-        }
-        for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-this->matrix_->getM()-2; --k) {
-            this->matrix_->updateCell(0, k, new Fraction(1, 1));
-        }
+        this->putInPFI();
 
         while (stepPrimal(file_output_steps, file_output_result));
         return;
@@ -292,6 +310,9 @@ void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes)
 
         // Get the correspondent line pivot.
         Fraction multiplier = *matrix_cells[i][indexes[1]];
+        if (multiplier == 0) {
+            continue;
+        }
 
         // Loop through columns elements of 'i' line.
         for (int j = 0; j < this->matrix_->getN(); ++j) {
