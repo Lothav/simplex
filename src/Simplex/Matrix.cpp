@@ -35,6 +35,19 @@ void Simplex::Matrix::insertCell(long i, std::vector<Fraction *>::const_iterator
     this->cells_[i].insert(this->cells_[i].end() - 1 , cell);
 }
 
+void Simplex::Matrix::addColumn(long pos, std::vector<Fraction*> column)
+{
+    if (pos > this->getN()-1 || column.size() != this->getM()) {
+        return;
+    }
+
+    for (int i = 0; i < this->getM(); ++i) {
+        this->cells_[i].insert(this->cells_[i].begin() + pos, column[i]);
+    }
+
+    this->n_ += 1;
+}
+
 void Simplex::Matrix::removeColumn(long column)
 {
     for (int k = 0; k < this->getM()-1; ++k) {

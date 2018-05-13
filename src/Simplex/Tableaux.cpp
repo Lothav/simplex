@@ -29,11 +29,13 @@ void Simplex::Tableaux::addSlackVariables()
     // It corresponds to slack variables (before 'b' vector).
     // First line we will get our certifies.
 
-    // Iterate lines.
-    for (int i = 0; i < this->matrix_->getM(); ++i) {
+    // Iterate columns.
+    for (int j = 0; j < this->matrix_->getM()-1; ++j) {
 
-        // Iterate columns.
-        for (int j = 0; j < this->matrix_->getM()-1; ++j) {
+        std::vector<Fraction*> column = {};
+
+        // Iterate lines.
+        for (int i = 0; i < this->matrix_->getM(); ++i) {
 
             // If line is 0, all columns is 0.
             // If line != 0, if column+1 == line then 1 else 0.
@@ -42,13 +44,13 @@ void Simplex::Tableaux::addSlackVariables()
             // Generate slack variable fraction.
             auto slack_var_element = new Fraction(slack_var_num, 1);
 
-            // Insert it straight before 'b' element.
-            this->matrix_->insertCell(i, matrix_->getCells()[i].begin(), slack_var_element);
+            // Fill column vector.
+            column.push_back(slack_var_element);
         }
-    }
 
-    // We add some columns, so, increment n value as much inserts by line (nested loop above).
-    this->matrix_->setN(this->matrix_->getN() + this->matrix_->getM() - 1);
+        // Insert it straight before 'b' element.
+        this->matrix_->addColumn(this->matrix_->getN()-1, column);
+    }
 }
 
 void Simplex::Tableaux::removeSlackVariables()
