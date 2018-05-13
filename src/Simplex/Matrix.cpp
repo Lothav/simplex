@@ -30,11 +30,6 @@ void Simplex::Matrix::updateCell(int i, int j, Fraction* cell)
     this->cells_[i][j] = cell;
 }
 
-void Simplex::Matrix::insertCell(long i, std::vector<Fraction *>::const_iterator j, Fraction* cell)
-{
-    this->cells_[i].insert(this->cells_[i].end() - 1 , cell);
-}
-
 void Simplex::Matrix::addColumn(long pos, std::vector<Fraction*> column)
 {
     if (pos > this->getN()-1 || column.size() != this->getM()) {
@@ -93,16 +88,6 @@ long Simplex::Matrix::getM() const
 long Simplex::Matrix::getN() const
 {
     return n_;
-}
-
-void Simplex::Matrix::setM(long m)
-{
-    this->m_ = m;
-}
-
-void Simplex::Matrix::setN(long n)
-{
-    this->n_ = n;
 }
 
 std::vector<std::vector<Simplex::Fraction*>> Simplex::Matrix::getCells() const

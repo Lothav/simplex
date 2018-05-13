@@ -28,15 +28,9 @@ namespace Simplex
 
         long getN() const;
 
-        void setM(long m);
-
-        void setN(long n);
-
         std::vector<std::vector<Fraction*>> getCells() const;
 
         void updateCell(int i, int j, Fraction* cell);
-
-        void insertCell(long i, std::vector<Fraction *>::const_iterator j, Fraction* cell);
 
         void addColumn(long pos, std::vector<Fraction*> column);
 
