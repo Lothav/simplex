@@ -51,6 +51,13 @@ void Simplex::Tableaux::addSlackVariables()
     this->matrix_->setN(this->matrix_->getN() + this->matrix_->getM() - 1);
 }
 
+void Simplex::Tableaux::removeSlackVariables()
+{
+    for (int j = 0; j < this->matrix_->getM()-1; ++j) {
+        this->matrix_->removeColumn(this->matrix_->getN()-2);
+    }
+}
+
 void Simplex::Tableaux::putInPFI()
 {
     // Search for lines with negative 'b' element.
@@ -65,7 +72,10 @@ void Simplex::Tableaux::putInPFI()
 
     this->addSlackVariables();
 
+    std::vector<Fraction*> save_first_line = {};
     for (int k = 0; k < this->matrix_->getN()-1; ++k) {
+        auto matrix_cells = this->matrix_->getCells();
+        save_first_line.push_back(matrix_cells[0][k]);
         this->matrix_->updateCell(0, k, new Fraction(0, 1));
     }
 
@@ -81,6 +91,39 @@ void Simplex::Tableaux::putInPFI()
             }
         }
     }
+
+    while (stepPrimal("pivoteamento.txt", ""));
+
+    auto matrix_cells = this->matrix_->getCells();
+    if (*matrix_cells[0][this->matrix_->getN()-1] == 0) {
+        this->removeSlackVariables();
+        for (int i = 0; i < this->matrix_->getN()-1; ++i) {
+            this->matrix_->updateCell(0, i, save_first_line[i]);
+        }
+        std::vector<std::array<int,2>> indexes = {};
+        std::array<int,2> index = EMPTY_INDEXES;
+        matrix_cells = this->matrix_->getCells();
+        for (int j = 0; j < this->matrix_->getN()-1; ++j) {
+            int count_one = 0;
+            for (int i = 1; i < this->matrix_->getM(); ++i) {
+                if (*matrix_cells[i][j] == 1) {
+                    index = {i, j};
+                    count_one++;
+                }
+            }
+            if (count_one == 1) {
+                indexes.push_back(index);
+            }
+        }
+        for (auto index_ : indexes) {
+            this->pivot(index_);
+
+            // Write matrix step on file.
+            std::string matrix_str = this->matrix_->toString();
+            Simplex::File::WriteOnFile("pivoteamento.txt", matrix_str);
+        }
+    }
+
 
 }
 
@@ -124,6 +167,13 @@ SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
 
 void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_output_result)
 {
+    std::ofstream ofs;
+    ofs.open(file_output_steps, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+
+    ofs.open(file_output_result, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+
     this->solve_method_ = this->getWhichSolveMethodApplies();
 
     if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {

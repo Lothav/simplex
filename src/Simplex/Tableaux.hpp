@@ -37,6 +37,8 @@ namespace Simplex {
 
         void addSlackVariables();
 
+        void removeSlackVariables();
+
         void putInPFI();
 
         SolveMethod getWhichSolveMethodApplies() const;
