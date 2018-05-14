@@ -60,15 +60,33 @@ void Simplex::Tableaux::removeSlackVariables()
     }
 }
 
-void Simplex::Tableaux::putInPFI(std::string file_output_steps)
+void Simplex::Tableaux::stepAux(std::string file_output_steps)
 {
-    std::vector<Fraction*> save_first_line = {};
+    this->addSlackVariables();
+
     for (int k = 0; k < this->matrix_->getN()-1; ++k) {
-        auto matrix_cells = this->matrix_->getCells();
-        save_first_line.push_back(matrix_cells[0][k]);
         this->matrix_->updateCell(0, k, new Fraction(0, 1));
     }
 
+    for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
+        this->matrix_->updateCell(0, static_cast<int>(k), new Fraction(1, 1));
+    }
+    for (int i = 1; i < this->matrix_->getM(); ++i) {
+        for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
+            auto matrix_cells = this->matrix_->getCells();
+            if (*matrix_cells[i][k] == 1 || *matrix_cells[i][k] == -1) {
+                this->pivot({i, static_cast<int>(k)}, file_output_steps);
+            }
+        }
+    }
+
+    while (stepPrimal(file_output_steps));
+
+    this->removeSlackVariables();
+}
+
+void Simplex::Tableaux::putInPFI(std::string file_output_steps)
+{
     // Search for lines with negative 'b' element.
     for (int i = 1; i < this->matrix_->getM(); ++i) {
         auto matrix_cells = this->matrix_->getCells();
@@ -79,37 +97,21 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
         }
     }
 
-    this->addSlackVariables();
-
-    for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
-        this->matrix_->updateCell(0, static_cast<int>(k), new Fraction(1, 1));
-    }
-
-    File::WriteOnFile("pivoteamento.txt", "Aux Canonical");
-
-    std::string matrix_str = this->matrix_->toString();
-    File::WriteOnFile("pivoteamento.txt", matrix_str);
-
-    for (int i = 1; i < this->matrix_->getM(); ++i) {
-        for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
-            auto matrix_cells = this->matrix_->getCells();
-            if (*matrix_cells[i][k] == 1 || *matrix_cells[i][k] == -1) {
-                this->pivot({i, static_cast<int>(k)}, file_output_steps);
-            }
-        }
-    }
-
-    File::WriteOnFile("pivoteamento.txt", "Primal Aux");
-
-    while (stepPrimal("pivoteamento.txt"));
-
-    this->removeSlackVariables();
-
     auto matrix_cells = this->matrix_->getCells();
-    if (*matrix_cells[0][this->matrix_->getN()-1] == 0) {
-        for (int i = 0; i < this->matrix_->getN()-1; ++i) {
-            this->matrix_->updateCell(0, i, save_first_line[i]);
+    std::vector<std::vector<Fraction*>> backup_matrix = {};
+    for (int l = 0; l < this->matrix_->getM(); ++l) {
+        backup_matrix.push_back({});
+        for (int i = 0; i < this->matrix_->getN(); ++i) {
+            backup_matrix[l].push_back(new Fraction(matrix_cells[l][i]->getNumerator(), matrix_cells[l][i]->getDenominator()));
         }
+    }
+
+    this->stepAux(file_output_steps);
+
+    matrix_cells = this->matrix_->getCells();
+    if (*matrix_cells[0][this->matrix_->getN()-1] == 0) {
+
+        // Get pivoted indexes;
         std::vector<std::array<int,2>> indexes = {};
         std::array<int,2> index = EMPTY_INDEXES;
         matrix_cells = this->matrix_->getCells();
@@ -125,16 +127,18 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
                 indexes.push_back(index);
             }
         }
-        Simplex::File::WriteOnFile("pivoteamento.txt", "Pivot Canonical");
-        matrix_str = this->matrix_->toString();
-        File::WriteOnFile("pivoteamento.txt", matrix_str);
+
+        // Recover matrix from backup.
+        for (int l = 0; l < this->matrix_->getM(); ++l) {
+            for (int i = 0; i < this->matrix_->getN(); ++i) {
+                this->matrix_->updateCell(l, i, backup_matrix[l][i]);
+            }
+        }
+
         for (auto index_ : indexes) {
             this->pivot(index_, file_output_steps);
         }
-        Simplex::File::WriteOnFile("pivoteamento.txt", "Pivot original matrix");
     }
-
-
 }
 
 SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
@@ -204,8 +208,7 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
         std::cout << "Using Aux Primal method..." << std::endl;
 
         this->putInPFI(file_output_steps);
-
-        while (stepPrimal(file_output_steps));
+        while(stepPrimal(file_output_steps));
         return;
     }
 }
