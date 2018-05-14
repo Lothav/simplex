@@ -2,15 +2,16 @@
 // Created by tracksale on 5/7/18.
 //
 
+#include <cmath>
 #include "Fraction.hpp"
 
 Simplex::Fraction::Fraction(BigInt numerator, BigInt denominator) : numerator_(numerator), denominator_(denominator)
 {
-    if (denominator == 0) {
+    if (denominator_ == 0) {
         throw "Denominator can't be zero!";
     }
 
-    if (denominator < 0) {
+    if (denominator_ < 0) {
         denominator_ *= -1;
         numerator_   *= -1;
     }
@@ -35,33 +36,63 @@ bool Simplex::Fraction::operator >(const Fraction& fraction)
 
 bool Simplex::Fraction::operator <(const long double& number)
 {
-    return this->getFloatValue() < number;
+    auto float_val = this->getFloatValue();
+
+    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
+        return true;
+    }
+
+    return float_val < number;
 }
 
 bool Simplex::Fraction::operator <=(const long double& number)
 {
-    return this->getFloatValue() <= number;
+    auto float_val = this->getFloatValue();
+
+    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
+        return false;
+    }
+
+    return float_val <= number;
 }
 
 bool Simplex::Fraction::operator >=(const long double& number)
 {
-    return this->getFloatValue() >= number;
+    auto float_val = this->getFloatValue();
+
+    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
+        return true;
+    }
+
+    return float_val >= number;
 }
 
 bool Simplex::Fraction::operator ==(const long double& number)
 {
-    return this->getFloatValue() == number;
+    auto float_val = this->getFloatValue();
+
+    if (number == 0 && float_val == 0 && this->numerator_ != 0) {
+        return false;
+    }
+
+    return float_val == number;
 }
 
 bool Simplex::Fraction::operator >(const long double& number)
 {
-    return this->getFloatValue() > number;
+    auto float_val = this->getFloatValue();
+
+    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
+        return false;
+    }
+
+    return float_val > number;
 }
 
 Simplex::Fraction* Simplex::Fraction::operator /(const Fraction& fraction)
 {
-    if (this->denominator_ == 0 || fraction.getNumerator() == 0) {
-        return new Fraction(0, 1);
+    if (fraction.getNumerator() == 0) {
+        std::cerr << "err: division by zero!" << std::endl;
     }
 
     return new Simplex::Fraction(this->numerator_ * fraction.getDenominator(), this->denominator_ * fraction.getNumerator());
@@ -111,7 +142,9 @@ long double Simplex::Fraction::getFloatValue() const
         den_aux /= truncate_rate;
     }
 
-    return static_cast<long double>(num_aux.toLongLong()) / static_cast<long double>(den_aux.toLongLong());
+    auto division = static_cast<long double>(num_aux.toLongLong()) / static_cast<long double>(den_aux.toLongLong());
+
+    return division;
 }
 
 BigInt Simplex::Fraction::gcd(const BigInt& a, const BigInt& b) const
