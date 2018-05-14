@@ -203,6 +203,7 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
     if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
         std::cout << "Using Dual method..." << std::endl;
         while(stepDual(file_output_steps));
+        this->checkSolution(file_output_result);
         return;
     }
 
@@ -384,9 +385,9 @@ void Simplex::Tableaux::checkSolution(std::string file_output_result)
         solution_str += "]";
 
         std::string certify_str = "[";
-            for (long k = this->matrix_->getN()-this->matrix_->getM(); k < this->matrix_->getN()-1; ++k) {
-                certify_str += std::to_string(matrix_cells[0][k]->getFloatValue()) + (k != this->matrix_->getN()-1 ? ", " : "");
-            }
+        for (long k = this->matrix_->getN()-this->matrix_->getM(); k < this->matrix_->getN()-1; ++k) {
+            certify_str += std::to_string(matrix_cells[0][k]->getFloatValue()) + (k != this->matrix_->getN()-2 ? ", " : "");
+        }
         certify_str += "]";
 
 
