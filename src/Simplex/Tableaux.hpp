@@ -57,7 +57,9 @@ namespace Simplex {
 
         void pivot(const std::array<int, 2>& indexes, std::string file_output_steps);
 
-        std::vector<std::array<int, 2>> getPivotedIndexes();
+        std::vector<std::array<int, 2>> getPivotedIndexes() const;
+
+        std::vector<long double> getSolution() const;
 
     };
 

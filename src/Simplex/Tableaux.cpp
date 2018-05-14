@@ -132,7 +132,7 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
     }
 }
 
-std::vector<std::array<int, 2>> Simplex::Tableaux::getPivotedIndexes()
+std::vector<std::array<int, 2>> Simplex::Tableaux::getPivotedIndexes() const
 {
     std::vector<std::array<int,2>> indexes = {};
     std::array<int,2> index = EMPTY_INDEXES;
@@ -349,6 +349,30 @@ std::array<int, 2> Simplex::Tableaux::getDualIndex() const
     return index;
 }
 
+std::vector<long double> Simplex::Tableaux::getSolution() const
+{
+    std::vector<long double> solution = {};
+    auto indexes = this->getPivotedIndexes();
+
+    auto matrix_cells = this->matrix_->getCells();
+
+    for (int l = 0; l < this->matrix_->getN()-this->matrix_->getM(); ++l) {
+        bool found = false;
+        for(auto index: indexes) {
+            if (index[1] == l) {
+                solution.push_back(matrix_cells[index[0]][this->matrix_->getN()-1]->getFloatValue());
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            solution.push_back(0.0f);
+        }
+    }
+
+    return solution;
+}
+
 void Simplex::Tableaux::writeSolution(std::string file_output_result) const
 {
     // Clear output file.
@@ -359,25 +383,10 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
     auto matrix_cells = this->matrix_->getCells();
     auto objective_value = matrix_cells[0][this->matrix_->getN()-1];
 
+    // Found a optimal solution.
     if (*objective_value > 0) {
 
-        std::vector<long double> solution = {};
-        matrix_cells = this->matrix_->getCells();
-        for (int j = 0; j < this->matrix_->getN()-this->matrix_->getM(); ++j) {
-            int count_one = 0;
-            int line_sol = -1;
-            for (int i = 1; i < this->matrix_->getM(); ++i) {
-                if (*matrix_cells[i][j] == 1) {
-                    line_sol = i;
-                    count_one++;
-                }
-            }
-            if (count_one == 1) {
-                solution.push_back(matrix_cells[line_sol][this->matrix_->getN()-1]->getFloatValue());
-            } else {
-                solution.push_back(0.0f);
-            }
-        }
+        auto solution = this->getSolution();
 
         std::string solution_str = "[";
         for (int k = 0; k < solution.size(); ++k) {
@@ -390,6 +399,7 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
         File::WriteOnFile(file_output_result, std::to_string(objective_value->getFloatValue()));
     }
 
+    // Non-viable matrix.
     if (*objective_value < 0) {
         File::WriteOnFile(file_output_result, "0");
     }
@@ -399,8 +409,8 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
         certify_str += std::to_string(matrix_cells[0][k]->getFloatValue()) + (k != this->matrix_->getN()-2 ? ", " : "");
     }
     certify_str += "]";
-    File::WriteOnFile(file_output_result, certify_str);
 
+    File::WriteOnFile(file_output_result, certify_str);
 }
 
 void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes, std::string file_output_steps)
