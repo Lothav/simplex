@@ -60,8 +60,15 @@ void Simplex::Tableaux::removeSlackVariables()
     }
 }
 
-void Simplex::Tableaux::putInPFI()
+void Simplex::Tableaux::putInPFI(std::string file_output_steps)
 {
+    std::vector<Fraction*> save_first_line = {};
+    for (int k = 0; k < this->matrix_->getN()-1; ++k) {
+        auto matrix_cells = this->matrix_->getCells();
+        save_first_line.push_back(matrix_cells[0][k]);
+        this->matrix_->updateCell(0, k, new Fraction(0, 1));
+    }
+
     // Search for lines with negative 'b' element.
     for (int i = 1; i < this->matrix_->getM(); ++i) {
         auto matrix_cells = this->matrix_->getCells();
@@ -73,13 +80,6 @@ void Simplex::Tableaux::putInPFI()
     }
 
     this->addSlackVariables();
-
-    std::vector<Fraction*> save_first_line = {};
-    for (int k = 0; k < this->matrix_->getN()-1; ++k) {
-        auto matrix_cells = this->matrix_->getCells();
-        save_first_line.push_back(matrix_cells[0][k]);
-        this->matrix_->updateCell(0, k, new Fraction(0, 1));
-    }
 
     for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
         this->matrix_->updateCell(0, static_cast<int>(k), new Fraction(1, 1));
@@ -94,10 +94,7 @@ void Simplex::Tableaux::putInPFI()
         for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
             auto matrix_cells = this->matrix_->getCells();
             if (*matrix_cells[i][k] == 1 || *matrix_cells[i][k] == -1) {
-                this->pivot({i, static_cast<int>(k)});
-                // Write matrix step on file.
-                matrix_str = this->matrix_->toString();
-                File::WriteOnFile("pivoteamento.txt", matrix_str);
+                this->pivot({i, static_cast<int>(k)}, file_output_steps);
             }
         }
     }
@@ -132,11 +129,7 @@ void Simplex::Tableaux::putInPFI()
         matrix_str = this->matrix_->toString();
         File::WriteOnFile("pivoteamento.txt", matrix_str);
         for (auto index_ : indexes) {
-            this->pivot(index_);
-
-            // Write matrix step on file.
-            matrix_str = this->matrix_->toString();
-            Simplex::File::WriteOnFile("pivoteamento.txt", matrix_str);
+            this->pivot(index_, file_output_steps);
         }
         Simplex::File::WriteOnFile("pivoteamento.txt", "Pivot original matrix");
     }
@@ -210,7 +203,7 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
     if (this->solve_method_ == SolveMethod::PRIMAL_AUX_METHOD) {
         std::cout << "Using Aux Primal method..." << std::endl;
 
-        this->putInPFI();
+        this->putInPFI(file_output_steps);
 
         while (stepPrimal(file_output_steps));
         return;
@@ -227,11 +220,7 @@ bool Simplex::Tableaux::stepPrimal(std::string file_output_steps)
     }
 
     // Pivot primal element.
-    this->pivot(primal_indexes);
-
-    // Write matrix step on file.
-    std::string matrix_str = this->matrix_->toString();
-    File::WriteOnFile(file_output_steps, matrix_str);
+    this->pivot(primal_indexes, file_output_steps);
 
     return true;
 }
@@ -252,11 +241,7 @@ bool Simplex::Tableaux::stepDual(std::string file_output_steps)
     }
 
     // Pivot dual element.
-    this->pivot(dual_indexes);
-
-    // Write matrix step on file.
-    std::string matrix_str = this->matrix_->toString();
-    Simplex::File::WriteOnFile(file_output_steps, matrix_str);
+    this->pivot(dual_indexes, file_output_steps);
 
     return true;
 }
@@ -398,7 +383,7 @@ void Simplex::Tableaux::checkSolution(std::string file_output_result)
     }
 }
 
-void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes)
+void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes, std::string file_output_steps)
 {
     auto matrix_cells = this->matrix_->getCells();
 
@@ -442,4 +427,8 @@ void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes)
             matrix_cells = this->matrix_->getCells();
         }
     }
+
+    // Pivot finished. Write modifications on 'file_output_steps' file.
+    std::string matrix_str = this->matrix_->toString();
+    Simplex::File::WriteOnFile(file_output_steps, matrix_str);
 }

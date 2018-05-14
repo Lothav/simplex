@@ -39,7 +39,7 @@ namespace Simplex {
 
         void removeSlackVariables();
 
-        void putInPFI();
+        void putInPFI(std::string file_output_result);
 
         SolveMethod getWhichSolveMethodApplies() const;
 
@@ -51,7 +51,7 @@ namespace Simplex {
 
         bool stepDual(std::string file_output_steps);
 
-        void pivot(const std::array<int, 2>& indexes);
+        void pivot(const std::array<int, 2>& indexes, std::string file_output_steps);
 
         void checkSolution(std::string file_output_result);
 
