@@ -67,6 +67,15 @@ std::string Simplex::Matrix::toString() const
 
         for (int j = 0; j < this->getN(); ++j) {
             long double value = this->cells_[i][j]->getFloatValue();
+
+            auto cell_string = std::to_string(value);
+
+            auto total_space = (i == 0 && j == 0 ? 10 : 11) - cell_string.length();
+            while (total_space > 0) {
+                matrix_string += ' ';
+                total_space--;
+            }
+
             matrix_string += std::to_string(value);
             if (j != this->getN()-1) {
                 matrix_string += ", ";
