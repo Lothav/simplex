@@ -49,7 +49,7 @@ namespace Simplex {
 
         void removeSlackVariables();
 
-        void putInPFI(std::string file_output_result);
+        void solveAux(std::string file_output_result);
 
         SolveMethod getWhichSolveMethodApplies() const;
 

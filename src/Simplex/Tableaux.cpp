@@ -85,7 +85,7 @@ void Simplex::Tableaux::stepAux(std::string file_output_steps)
     this->removeSlackVariables();
 }
 
-void Simplex::Tableaux::putInPFI(std::string file_output_steps)
+void Simplex::Tableaux::solveAux(std::string file_output_steps)
 {
     // Search for lines with negative 'b' element.
     for (int i = 1; i < this->matrix_->getM(); ++i) {
@@ -129,6 +129,8 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
         for (auto index_ : indexes) {
             this->pivot(index_, file_output_steps);
         }
+    } else {
+        this->solution_ = Solution::NON_VIABLE;
     }
 }
 
@@ -212,7 +214,7 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
 
     if (this->solve_method_ == SolveMethod::PRIMAL_AUX_METHOD) {
         std::cout << "Using Aux Primal method..." << std::endl;
-        this->putInPFI(file_output_steps);
+        this->solveAux(file_output_steps);
         while(stepPrimal(file_output_steps));
     }
 
@@ -221,6 +223,11 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
 
 void Simplex::Tableaux::checkSolution()
 {
+    if (this->solution_ != Solution::NONE) {
+        std::cerr << "Solution already set!" << std::endl;
+        return;
+    }
+
     auto matrix_cells = this->matrix_->getCells();
 
     // Check for 'A' column < 0.
