@@ -191,13 +191,11 @@ SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
     return PRIMAL_AUX_METHOD;
 }
 
-void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_output_result)
+void Simplex::Tableaux::solve(std::string file_output_steps)
 {
+    // Clear output file.
     std::ofstream ofs;
     ofs.open(file_output_steps, std::ofstream::out | std::ofstream::trunc);
-    ofs.close();
-
-    ofs.open(file_output_result, std::ofstream::out | std::ofstream::trunc);
     ofs.close();
 
     this->solve_method_ = this->getWhichSolveMethodApplies();
@@ -205,14 +203,12 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
     if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
         std::cout << "Using Primal method..." << std::endl;
         while (stepPrimal(file_output_steps));
-        this->checkSolution(file_output_result);
         return;
     }
 
     if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
         std::cout << "Using Dual method..." << std::endl;
         while(stepDual(file_output_steps));
-        this->checkSolution(file_output_result);
         return;
     }
 
@@ -220,7 +216,6 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
         std::cout << "Using Aux Primal method..." << std::endl;
         this->putInPFI(file_output_steps);
         while(stepPrimal(file_output_steps));
-        this->checkSolution(file_output_result);
         return;
     }
 }
@@ -354,8 +349,13 @@ std::array<int, 2> Simplex::Tableaux::getDualIndex() const
     return index;
 }
 
-void Simplex::Tableaux::checkSolution(std::string file_output_result)
+void Simplex::Tableaux::writeSolution(std::string file_output_result) const
 {
+    // Clear output file.
+    std::ofstream ofs;
+    ofs.open(file_output_result, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+
     auto matrix_cells = this->matrix_->getCells();
     auto objective_value = matrix_cells[0][this->matrix_->getN()-1];
 

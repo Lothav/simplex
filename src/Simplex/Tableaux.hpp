@@ -31,7 +31,9 @@ namespace Simplex {
 
         Tableaux(long m, long n, const std::vector<long> &cells);
 
-        void solve(std::string file_output_steps, std::string file_output_result);
+        void solve(std::string file_output_steps);
+
+        void writeSolution(std::string file_output_result) const;
 
     private:
 
@@ -56,8 +58,6 @@ namespace Simplex {
         void pivot(const std::array<int, 2>& indexes, std::string file_output_steps);
 
         std::vector<std::array<int, 2>> getPivotedIndexes();
-
-        void checkSolution(std::string file_output_result);
 
     };
 
