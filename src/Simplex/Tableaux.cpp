@@ -417,6 +417,11 @@ std::vector<long double> Simplex::Tableaux::getSolution() const
 
 void Simplex::Tableaux::writeSolution(std::string file_output_result) const
 {
+    if (this->solution_ == Solution::NONE) {
+        std::cerr << "Solution not set!" << std::endl;
+        return;
+    }
+
     // Clear output file.
     std::ofstream ofs;
     ofs.open(file_output_result, std::ofstream::out | std::ofstream::trunc);
