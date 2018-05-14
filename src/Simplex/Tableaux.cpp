@@ -343,6 +343,7 @@ void Simplex::Tableaux::checkSolution(std::string file_output_result)
 {
     auto matrix_cells = this->matrix_->getCells();
     auto objective_value = matrix_cells[0][this->matrix_->getN()-1];
+
     if (objective_value > 0) {
 
         std::vector<long double> solution = {};
@@ -374,7 +375,6 @@ void Simplex::Tableaux::checkSolution(std::string file_output_result)
             certify_str += std::to_string(matrix_cells[0][k]->getFloatValue()) + (k != this->matrix_->getN()-2 ? ", " : "");
         }
         certify_str += "]";
-
 
         File::WriteOnFile(file_output_result, "2");
         File::WriteOnFile(file_output_result, solution_str);

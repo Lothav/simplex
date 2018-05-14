@@ -101,24 +101,17 @@ long double Simplex::Fraction::getFloatValue() const
 
     int truncate_rate = 2;
 
-    auto greater = this->numerator_ > this->denominator_ ? this->numerator_ : this->denominator_;
-    auto lower   = this->numerator_ < this->denominator_ ? this->numerator_ : this->denominator_;
+    auto num_aux = this->numerator_;
+    auto den_aux = this->denominator_;
 
-    while (greater > BigInt(LLONG_MAX)) {
-        greater /= truncate_rate;
-        lower /= truncate_rate;
+    while ( num_aux > BigInt(LLONG_MAX) || den_aux > BigInt(LLONG_MAX) ||
+            num_aux < BigInt(LLONG_MIN) || den_aux < BigInt(LLONG_MIN))
+    {
+        num_aux /= truncate_rate;
+        den_aux /= truncate_rate;
     }
 
-    while (lower < BigInt(LLONG_MIN)) {
-        greater /= truncate_rate;
-        lower /= truncate_rate;
-    }
-
-    if (this->numerator_ > this->denominator_) {
-        return static_cast<long double>(greater.toLongLong()) / static_cast<long double>(lower.toLongLong());
-    } else {
-        return static_cast<long double>(lower.toLongLong()) / static_cast<long double>(greater.toLongLong());
-    }
+    return static_cast<long double>(num_aux.toLongLong()) / static_cast<long double>(den_aux.toLongLong());
 }
 
 BigInt Simplex::Fraction::gcd(const BigInt& a, const BigInt& b) const
