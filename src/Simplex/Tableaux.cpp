@@ -97,6 +97,7 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
         }
     }
 
+    // Save the matrix as backup.
     auto matrix_cells = this->matrix_->getCells();
     std::vector<std::vector<Fraction*>> backup_matrix = {};
     for (int l = 0; l < this->matrix_->getM(); ++l) {
@@ -106,27 +107,14 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
         }
     }
 
+    // Run auxiliar matrix code.
     this->stepAux(file_output_steps);
 
-    matrix_cells = this->matrix_->getCells();
-    if (*matrix_cells[0][this->matrix_->getN()-1] == 0) {
+    // Check if objective value equal zero.
+    auto objective_value = *this->matrix_->getCells()[0][this->matrix_->getN()-1];
+    if (objective_value == 0) {
 
-        // Get pivoted indexes;
-        std::vector<std::array<int,2>> indexes = {};
-        std::array<int,2> index = EMPTY_INDEXES;
-        matrix_cells = this->matrix_->getCells();
-        for (int j = 0; j < this->matrix_->getN()-1; ++j) {
-            int count_one = 0;
-            for (int i = 1; i < this->matrix_->getM(); ++i) {
-                if (*matrix_cells[i][j] == 1) {
-                    index = {i, j};
-                    count_one++;
-                }
-            }
-            if (count_one == 1) {
-                indexes.push_back(index);
-            }
-        }
+        // Get pivoted indexes.
 
         // Recover matrix from backup.
         for (int l = 0; l < this->matrix_->getM(); ++l) {
@@ -135,11 +123,35 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
             }
         }
 
+        auto indexes = this->getPivotedIndexes();
+
+        // Pivot found indexes.
         for (auto index_ : indexes) {
             this->pivot(index_, file_output_steps);
         }
     }
 }
+
+std::vector<std::array<int, 2>> Simplex::Tableaux::getPivotedIndexes()
+{
+    std::vector<std::array<int,2>> indexes = {};
+    std::array<int,2> index = EMPTY_INDEXES;
+
+    for (int j = 0; j < this->matrix_->getN()-1; ++j) {
+        int count_one = 0;
+        for (int i = 1; i < this->matrix_->getM(); ++i) {
+            if (*this->matrix_->getCells()[i][j] == 1) {
+                index = {i, j};
+                count_one++;
+            }
+        }
+        if (count_one == 1) {
+            indexes.push_back(index);
+        }
+    }
+
+    return indexes;
+};
 
 SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
 {
