@@ -82,23 +82,34 @@ void Simplex::Tableaux::putInPFI()
     }
 
     for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
-        this->matrix_->updateCell(0, k, new Fraction(1, 1));
+        this->matrix_->updateCell(0, static_cast<int>(k), new Fraction(1, 1));
     }
+
+    File::WriteOnFile("pivoteamento.txt", "Aux Canonical");
+
+    std::string matrix_str = this->matrix_->toString();
+    File::WriteOnFile("pivoteamento.txt", matrix_str);
 
     for (int i = 1; i < this->matrix_->getM(); ++i) {
         for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
             auto matrix_cells = this->matrix_->getCells();
             if (*matrix_cells[i][k] == 1 || *matrix_cells[i][k] == -1) {
-                this->pivot({i, k});
+                this->pivot({i, static_cast<int>(k)});
+                // Write matrix step on file.
+                matrix_str = this->matrix_->toString();
+                File::WriteOnFile("pivoteamento.txt", matrix_str);
             }
         }
     }
 
+    File::WriteOnFile("pivoteamento.txt", "Primal Aux");
+
     while (stepPrimal("pivoteamento.txt", ""));
+
+    this->removeSlackVariables();
 
     auto matrix_cells = this->matrix_->getCells();
     if (*matrix_cells[0][this->matrix_->getN()-1] == 0) {
-        this->removeSlackVariables();
         for (int i = 0; i < this->matrix_->getN()-1; ++i) {
             this->matrix_->updateCell(0, i, save_first_line[i]);
         }
@@ -117,13 +128,17 @@ void Simplex::Tableaux::putInPFI()
                 indexes.push_back(index);
             }
         }
+        Simplex::File::WriteOnFile("pivoteamento.txt", "Pivot Canonical");
+        matrix_str = this->matrix_->toString();
+        File::WriteOnFile("pivoteamento.txt", matrix_str);
         for (auto index_ : indexes) {
             this->pivot(index_);
 
             // Write matrix step on file.
-            std::string matrix_str = this->matrix_->toString();
+            matrix_str = this->matrix_->toString();
             Simplex::File::WriteOnFile("pivoteamento.txt", matrix_str);
         }
+        Simplex::File::WriteOnFile("pivoteamento.txt", "Pivot original matrix");
     }
 
 

@@ -45,6 +45,11 @@ void Simplex::Matrix::addColumn(long pos, std::vector<Fraction*> column)
 
 void Simplex::Matrix::removeColumn(long column)
 {
+    if (column > this->getN()-1) {
+        std::cerr << "Cannot remove " << column << "th column from a matrix with " << this->getN() << " columns!" << std::endl;
+        return;
+    }
+
     for (int k = 0; k < this->getM()-1; ++k) {
         this->cells_[k].erase(this->cells_[k].begin() + column);
     }
