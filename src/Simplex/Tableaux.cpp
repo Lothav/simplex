@@ -206,9 +206,9 @@ void Simplex::Tableaux::solve(std::string file_output_steps, std::string file_ou
 
     if (this->solve_method_ == SolveMethod::PRIMAL_AUX_METHOD) {
         std::cout << "Using Aux Primal method..." << std::endl;
-
         this->putInPFI(file_output_steps);
         while(stepPrimal(file_output_steps));
+        this->checkSolution(file_output_result);
         return;
     }
 }
