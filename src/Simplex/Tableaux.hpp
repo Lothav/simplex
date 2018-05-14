@@ -47,11 +47,13 @@ namespace Simplex {
 
         std::array<int, 2> getDualIndex() const;
 
-        bool stepPrimal(std::string file_output_steps, std::string file_output_result);
+        bool stepPrimal(std::string file_output_steps);
 
-        bool stepDual(std::string file_output_steps, std::string file_output_result);
+        bool stepDual(std::string file_output_steps);
 
         void pivot(const std::array<int, 2>& indexes);
+
+        void checkSolution(std::string file_output_result);
 
     };
 

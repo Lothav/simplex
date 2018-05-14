@@ -89,7 +89,7 @@ std::string Simplex::Matrix::toString() const
         }
     }
 
-    matrix_string += "]";
+    matrix_string += "]\n";
 
     return matrix_string;
 }
