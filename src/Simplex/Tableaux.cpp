@@ -359,7 +359,7 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
     auto matrix_cells = this->matrix_->getCells();
     auto objective_value = matrix_cells[0][this->matrix_->getN()-1];
 
-    if (objective_value > 0) {
+    if (*objective_value > 0) {
 
         std::vector<long double> solution = {};
         matrix_cells = this->matrix_->getCells();
@@ -385,17 +385,22 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
         }
         solution_str += "]";
 
-        std::string certify_str = "[";
-        for (long k = this->matrix_->getN()-this->matrix_->getM(); k < this->matrix_->getN()-1; ++k) {
-            certify_str += std::to_string(matrix_cells[0][k]->getFloatValue()) + (k != this->matrix_->getN()-2 ? ", " : "");
-        }
-        certify_str += "]";
-
         File::WriteOnFile(file_output_result, "2");
         File::WriteOnFile(file_output_result, solution_str);
         File::WriteOnFile(file_output_result, std::to_string(objective_value->getFloatValue()));
-        File::WriteOnFile(file_output_result, certify_str);
     }
+
+    if (*objective_value < 0) {
+        File::WriteOnFile(file_output_result, "0");
+    }
+
+    std::string certify_str = "[";
+    for (long k = this->matrix_->getN()-this->matrix_->getM(); k < this->matrix_->getN()-1; ++k) {
+        certify_str += std::to_string(matrix_cells[0][k]->getFloatValue()) + (k != this->matrix_->getN()-2 ? ", " : "");
+    }
+    certify_str += "]";
+    File::WriteOnFile(file_output_result, certify_str);
+
 }
 
 void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes, std::string file_output_steps)
