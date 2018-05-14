@@ -4,7 +4,7 @@
 
 #include "Tableaux.hpp"
 
-Simplex::Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD)
+Simplex::Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(Solution::NONE)
 {
     std::vector<BigInt> bi;
     for(auto bi_c: cells) {
@@ -107,7 +107,7 @@ void Simplex::Tableaux::putInPFI(std::string file_output_steps)
         }
     }
 
-    // Run auxiliar matrix code.
+    // Run aux matrix code.
     this->stepAux(file_output_steps);
 
     // Check if objective value equal zero.
@@ -203,21 +203,63 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
     if (this->solve_method_ == SolveMethod::PRIMAL_METHOD) {
         std::cout << "Using Primal method..." << std::endl;
         while (stepPrimal(file_output_steps));
-        return;
     }
 
     if (this->solve_method_ == SolveMethod::DUAL_METHOD) {
         std::cout << "Using Dual method..." << std::endl;
         while(stepDual(file_output_steps));
-        return;
     }
 
     if (this->solve_method_ == SolveMethod::PRIMAL_AUX_METHOD) {
         std::cout << "Using Aux Primal method..." << std::endl;
         this->putInPFI(file_output_steps);
         while(stepPrimal(file_output_steps));
-        return;
     }
+
+    this->checkSolution();
+}
+
+void Simplex::Tableaux::checkSolution()
+{
+    auto matrix_cells = this->matrix_->getCells();
+
+    // Check for 'A' column < 0.
+    for (int i = 0; i < this->matrix_->getN()-1; ++i) {
+        bool check_all_negative = true;
+        for (int j = 1; j < this->matrix_->getM(); ++j) {
+            if (*matrix_cells[j][i] >= 0) {
+                check_all_negative = false;
+                break;
+            }
+        }
+        if (check_all_negative) {
+            if (*matrix_cells[0][i] >= 0) {
+                this->solution_ = Solution::NON_VIABLE;
+            } else {
+                this->solution_ = Solution::UNLIMITED;
+            }
+            return;
+        }
+    }
+
+    // Check 'c' vector < 0.
+    for (int i = 0; i < this->matrix_->getN()-1; ++i) {
+        if (*matrix_cells[0][i] < 0) {
+            this->solution_ = Solution::NON_VIABLE;
+            return;
+        }
+    }
+
+    // Check 'b' vector < 0.
+    for (int i = 1; i < this->matrix_->getM(); ++i) {
+        if (*matrix_cells[i][this->matrix_->getN()-1] < 0) {
+            this->solution_ = Solution::NON_VIABLE;
+            return;
+        }
+    }
+
+    // Solution is viable.
+    this->solution_ = Solution::VIABLE;
 }
 
 bool Simplex::Tableaux::stepPrimal(std::string file_output_steps)
@@ -384,7 +426,7 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
     auto objective_value = matrix_cells[0][this->matrix_->getN()-1];
 
     // Found a optimal solution.
-    if (*objective_value > 0) {
+    if (this->solution_ == Solution::VIABLE) {
 
         auto solution = this->getSolution();
 
@@ -399,9 +441,14 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
         File::WriteOnFile(file_output_result, std::to_string(objective_value->getFloatValue()));
     }
 
-    // Non-viable matrix.
-    if (*objective_value < 0) {
+    // Non-viable tableaux.
+    if (this->solution_ == Solution::NON_VIABLE) {
         File::WriteOnFile(file_output_result, "0");
+    }
+
+    // Unlimited tableaux.
+    if (this->solution_ == Solution::UNLIMITED) {
+        File::WriteOnFile(file_output_result, "1");
     }
 
     std::string certify_str = "[";
