@@ -218,7 +218,9 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
         while(stepPrimal(file_output_steps));
     }
 
-    this->checkSolution();
+    if (this->solution_ == Solution::NONE) {
+        this->checkSolution();
+    }
 }
 
 void Simplex::Tableaux::checkSolution()
@@ -234,18 +236,16 @@ void Simplex::Tableaux::checkSolution()
     for (int i = 0; i < this->matrix_->getN()-1; ++i) {
         bool check_all_negative = true;
         for (int j = 1; j < this->matrix_->getM(); ++j) {
-            if (*matrix_cells[j][i] >= 0) {
+            if (*matrix_cells[j][i] > 0) {
                 check_all_negative = false;
                 break;
             }
         }
         if (check_all_negative) {
-            if (*matrix_cells[0][i] >= 0) {
-                this->solution_ = Solution::NON_VIABLE;
-            } else {
+            if (*matrix_cells[0][i] < 0) {
                 this->solution_ = Solution::UNLIMITED;
+                return;
             }
-            return;
         }
     }
 
