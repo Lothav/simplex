@@ -38,7 +38,8 @@ int main(int argc, char** argv)
 
     // Generate matrix from input file.
     auto tableaux = new Simplex::Tableaux(matrix_m+1, matrix_n+1, matrix_cells);
-    tableaux->solve(STEP_WRITE_FILE, SOLUTION_WRITE_FILE);
+    tableaux->solve(STEP_WRITE_FILE);
+    tableaux->writeSolution(SOLUTION_WRITE_FILE);
 
     const clock_t end_time = std::clock();
     auto time_spent = static_cast<float>( (end_time - begin_time)) / CLOCKS_PER_SEC ;

@@ -15,6 +15,13 @@ enum SolveMethod {
     PRIMAL_AUX_METHOD
 };
 
+enum Solution {
+    NONE,
+    VIABLE,
+    NON_VIABLE,
+    UNLIMITED
+};
+
 const std::array<int, 2> EMPTY_INDEXES = {-1, -1};
 
 namespace Simplex {
@@ -24,14 +31,17 @@ namespace Simplex {
 
     private:
 
-        Matrix* matrix_;
         SolveMethod solve_method_;
+        Matrix*     matrix_;
+        Solution    solution_;
 
     public:
 
         Tableaux(long m, long n, const std::vector<long> &cells);
 
-        void solve(std::string file_output_steps, std::string file_output_result);
+        void solve(std::string file_output_steps);
+
+        void writeSolution(std::string file_output_result) const;
 
     private:
 
@@ -39,7 +49,7 @@ namespace Simplex {
 
         void removeSlackVariables();
 
-        void putInPFI(std::string file_output_result);
+        void solveAux(std::string file_output_result);
 
         SolveMethod getWhichSolveMethodApplies() const;
 
@@ -51,9 +61,15 @@ namespace Simplex {
 
         bool stepDual(std::string file_output_steps);
 
+        void stepAux(std::string file_output_steps);
+
         void pivot(const std::array<int, 2>& indexes, std::string file_output_steps);
 
-        void checkSolution(std::string file_output_result);
+        std::vector<std::array<int, 2>> getPivotedIndexes() const;
+
+        void checkSolution();
+
+        std::vector<long double> getSolution() const;
 
     };
 
