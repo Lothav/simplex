@@ -8,7 +8,7 @@
 Simplex::Fraction::Fraction(BigInt numerator, BigInt denominator) : numerator_(numerator), denominator_(denominator)
 {
     if (denominator_ == 0) {
-        throw "Denominator can't be zero!";
+        throw std::invalid_argument("Denominator can't be zero!");
     }
 
     if (denominator_ < 0) {
@@ -36,57 +36,27 @@ bool Simplex::Fraction::operator >(const Fraction& fraction)
 
 bool Simplex::Fraction::operator <(const long double& number)
 {
-    auto float_val = this->getFloatValue();
-
-    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
-        return true;
-    }
-
-    return float_val < number;
+    return this->getFloatValue() < number;
 }
 
 bool Simplex::Fraction::operator <=(const long double& number)
 {
-    auto float_val = this->getFloatValue();
-
-    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
-        return false;
-    }
-
-    return float_val <= number;
+    return this->getFloatValue() <= number;
 }
 
 bool Simplex::Fraction::operator >=(const long double& number)
 {
-    auto float_val = this->getFloatValue();
-
-    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
-        return true;
-    }
-
-    return float_val >= number;
+    return this->getFloatValue() >= number;
 }
 
 bool Simplex::Fraction::operator ==(const long double& number)
 {
-    auto float_val = this->getFloatValue();
-
-    if (number == 0 && float_val == 0 && this->numerator_ != 0) {
-        return false;
-    }
-
-    return float_val == number;
+    return this->getFloatValue() == number;
 }
 
 bool Simplex::Fraction::operator >(const long double& number)
 {
-    auto float_val = this->getFloatValue();
-
-    if (float_val == 0 && this->numerator_ < 0 && number >= 0) {
-        return false;
-    }
-
-    return float_val > number;
+    return this->getFloatValue() > number;
 }
 
 Simplex::Fraction* Simplex::Fraction::operator /(const Fraction& fraction)
@@ -126,11 +96,11 @@ BigInt Simplex::Fraction::getDenominator() const
 long double Simplex::Fraction::getFloatValue() const
 {
     // We want to cast our division to 'long double'.
-    // But it's possible only with primitive types (not BigInt).
-    // So, we need check if both numerator and denominator fits into a 'long long int' (biggest type).
-    // If doesn't, truncate both until it fits!
+    // But, it's possible only with primitive types (not BigInt).
+    // So we need check if both numerator and denominator fits into a 'long long int' (biggest type).
+    // If doesn't, divide both until it fits!
 
-    int truncate_rate = 2;
+    int division_rate = 2;
 
     auto num_aux = this->numerator_;
     auto den_aux = this->denominator_;
@@ -138,8 +108,8 @@ long double Simplex::Fraction::getFloatValue() const
     while ( num_aux > BigInt(LLONG_MAX) || den_aux > BigInt(LLONG_MAX) ||
             num_aux < BigInt(LLONG_MIN) || den_aux < BigInt(LLONG_MIN))
     {
-        num_aux /= truncate_rate;
-        den_aux /= truncate_rate;
+        num_aux /= division_rate;
+        den_aux /= division_rate;
     }
 
     auto division = static_cast<long double>(num_aux.toLongLong()) / static_cast<long double>(den_aux.toLongLong());
