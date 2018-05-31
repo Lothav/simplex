@@ -4,7 +4,7 @@
 
 #include "Tableaux.hpp"
 
-Simplex::Tableaux::Tableaux(long m, long n, const std::vector<long> &cells) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(Solution::NONE)
+Simplex::Tableaux::Tableaux(long m, long n, const std::vector<long> &cells, Type type) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(Solution::NONE), type_(type)
 {
     std::vector<BigInt> bi;
     for(auto bi_c: cells) {
@@ -71,6 +71,7 @@ void Simplex::Tableaux::stepAux(std::string file_output_steps)
     for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
         this->matrix_->updateCell(0, static_cast<int>(k), new Fraction(1, 1));
     }
+
     for (int i = 1; i < this->matrix_->getM(); ++i) {
         for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
             auto matrix_cells = this->matrix_->getCells();

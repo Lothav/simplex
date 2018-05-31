@@ -27,12 +27,19 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    auto matrix_m = std::stoi (file_data[0]);
-    auto matrix_n = std::stoi (file_data[1]);
-    auto matrix_cells = Simplex::File::GetIntsFromStringFile(file_data[2]);
+    auto type = Type::NON_INT;
+    int method_index = 0;
+
+    if (file_data.size() == 4) {
+        type = file_data[method_index++] == 0 ? Type::INT_CUTTING_PLANE : Type::INT_CUTTING_PLANE;
+    }
+
+    auto matrix_m = std::stoi(file_data[method_index++]);
+    auto matrix_n = std::stoi(file_data[method_index++]);
+    auto matrix_cells = Simplex::File::GetIntsFromStringFile(file_data[method_index]);
 
     // Generate matrix from input file.
-    auto tableaux = new Simplex::Tableaux(matrix_m+1, matrix_n+1, matrix_cells);
+    auto tableaux = std::make_unique<Simplex::Tableaux>(matrix_m+1, matrix_n+1, matrix_cells, type);
     tableaux->solve(STEP_WRITE_FILE);
     tableaux->writeSolution(SOLUTION_WRITE_FILE);
 

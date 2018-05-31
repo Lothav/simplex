@@ -9,6 +9,12 @@
 #include "Matrix.hpp"
 #include "File.hpp"
 
+enum Type {
+    NON_INT,
+    INT_CUTTING_PLANE,
+    INT_BRANCH_N_BOUND
+};
+
 enum SolveMethod {
     DUAL_METHOD,
     PRIMAL_METHOD,
@@ -31,13 +37,15 @@ namespace Simplex {
 
     private:
 
+        Type        type_;
         SolveMethod solve_method_;
         Matrix*     matrix_;
         Solution    solution_;
 
+
     public:
 
-        Tableaux(long m, long n, const std::vector<long> &cells);
+        Tableaux(long m, long n, const std::vector<long> &cells, Type type);
 
         void solve(std::string file_output_steps);
 
