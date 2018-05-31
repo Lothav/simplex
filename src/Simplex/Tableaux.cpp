@@ -101,7 +101,7 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
     auto matrix_cells = this->matrix_->getCells();
     std::vector<std::vector<Fraction*>> backup_matrix = {};
     for (int l = 0; l < this->matrix_->getM(); ++l) {
-        backup_matrix.push_back({});
+        backup_matrix.emplace_back({});
         for (int i = 0; i < this->matrix_->getN(); ++i) {
             backup_matrix[l].push_back(new Fraction(matrix_cells[l][i]->getNumerator(), matrix_cells[l][i]->getDenominator()));
         }

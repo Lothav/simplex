@@ -29,6 +29,8 @@ namespace Simplex
 
         static std::vector<long> GetIntsFromStringFile(std::string data_string);
 
+        static bool checkFile(const std::vector<std::string>& file_stream);
+
     private:
 
         static std::vector<std::string> readStream(std::istream& input_stream);

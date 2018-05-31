@@ -49,6 +49,31 @@ std::vector<long> Simplex::File::GetIntsFromStringFile(std::string data_string)
     return data_int;
 }
 
+bool Simplex::File::checkFile(const std::vector<std::string>& file_stream)
+{
+    if (file_stream.size() != 3 || file_stream.size() != 4) {
+
+        std::cerr << "Invalid file input!" << std::endl << std::endl;
+        std::cerr << "File must have 3 lines, as the format below, to solve using Primal/Dual methods:" << std::endl;
+        std::cerr << "\tm+1" << std::endl;
+        std::cerr << "\tn+1" << std::endl;
+        std::cerr << "\t[[line 0 ], [line 1], ..., [line n]]" << std::endl;
+        std::cerr << std::endl << std::endl;
+        std::cerr << "Or 4 lines, as the format below, to solve using Branch n' Bound/Cutting-plane methods:" << std::endl;
+        std::cerr << "\tX" << std::endl;
+        std::cerr << "\tm+1" << std::endl;
+        std::cerr << "\tn+1" << std::endl;
+        std::cerr << "\t[[line 0 ], [line 1], ..., [line n]]" << std::endl;
+        std::cerr << "Where 'X': " << std::endl;
+        std::cerr << "\t1 to solve using Branch n' Bound method" << std::endl;
+        std::cerr << "\t0 to solve using Cutting-plane method." << std::endl;
+
+        return false;
+    }
+
+    return true;
+}
+
 std::vector<std::string> Simplex::File::readStream(std::istream& input_stream)
 {
     std::vector<std::string> lines;
