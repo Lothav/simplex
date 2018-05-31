@@ -30,7 +30,7 @@ namespace Simplex
 
         std::vector<std::vector<Fraction*>> getCells() const;
 
-        void updateCell(int i, int j, Fraction* cell);
+        void updateCell(long i, long j, Fraction* cell);
 
         void addColumn(long pos, std::vector<Fraction*> column);
 

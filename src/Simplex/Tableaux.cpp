@@ -102,7 +102,7 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
     auto matrix_cells = this->matrix_->getCells();
     std::vector<std::vector<Fraction*>> backup_matrix = {};
     for (int l = 0; l < this->matrix_->getM(); ++l) {
-        backup_matrix.emplace_back({});
+        backup_matrix.push_back({});
         for (int i = 0; i < this->matrix_->getN(); ++i) {
             backup_matrix[l].push_back(new Fraction(matrix_cells[l][i]->getNumerator(), matrix_cells[l][i]->getDenominator()));
         }
@@ -135,10 +135,10 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
     }
 }
 
-std::vector<std::array<int, 2>> Simplex::Tableaux::getPivotedIndexes() const
+std::vector<std::array<long, 2>> Simplex::Tableaux::getPivotedIndexes() const
 {
-    std::vector<std::array<int,2>> indexes = {};
-    std::array<int,2> index = EMPTY_INDEXES;
+    std::vector<std::array<long,2>> indexes = {};
+    std::array<long, 2> index = EMPTY_INDEXES;
 
     for (int j = 0; j < this->matrix_->getN()-1; ++j) {
         int count_one = 0;
@@ -221,6 +221,13 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
 
     if (this->solution_ == Solution::NONE) {
         this->checkSolution();
+    }
+
+    if (this->type_ == Type::INT_CUTTING_PLANE) {
+        if (this->solution_ == Solution::VIABLE) {
+            auto float_index = this->getBFirstFloatIndex();
+            std::cout << float_index[0] << " " << float_index[1] << std::endl;
+        }
     }
 }
 
@@ -306,9 +313,9 @@ bool Simplex::Tableaux::stepDual(std::string file_output_steps)
     return true;
 }
 
-std::array<int, 2> Simplex::Tableaux::getPrimalIndex() const
+std::array<long, 2> Simplex::Tableaux::getPrimalIndex() const
 {
-    std::array<int, 2> index = EMPTY_INDEXES;
+    std::array<long, 2> index = EMPTY_INDEXES;
 
     auto matrix_cells = matrix_->getCells();
 
@@ -351,9 +358,9 @@ std::array<int, 2> Simplex::Tableaux::getPrimalIndex() const
     return index;
 }
 
-std::array<int, 2> Simplex::Tableaux::getDualIndex() const
+std::array<long, 2> Simplex::Tableaux::getDualIndex() const
 {
-    std::array<int, 2> index = EMPTY_INDEXES;
+    std::array<long, 2> index = EMPTY_INDEXES;
 
     auto matrix_cells = matrix_->getCells();
 
@@ -473,7 +480,7 @@ void Simplex::Tableaux::writeSolution(std::string file_output_result) const
     File::WriteOnFile(file_output_result, certify_str);
 }
 
-void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes, std::string file_output_steps)
+void Simplex::Tableaux::pivot(const std::array<long, 2>& indexes, std::string file_output_steps)
 {
     auto matrix_cells = this->matrix_->getCells();
 
@@ -521,4 +528,32 @@ void Simplex::Tableaux::pivot(const std::array<int, 2>& indexes, std::string fil
     // Pivot finished. Write modifications on 'file_output_steps' file.
     std::string matrix_str = this->matrix_->toString();
     Simplex::File::WriteOnFile(file_output_steps, matrix_str);
+}
+
+std::vector<Simplex::Fraction *> Simplex::Tableaux::getBVector() const
+{
+    std::vector<Fraction *> b_vec;
+
+    long b_column = this->matrix_->getN()-1;
+    auto matrix_cells = this->matrix_->getCells();
+
+    for (int i = 1; i < this->matrix_->getM(); ++i) {
+        b_vec.push_back(matrix_cells[i][b_column]);
+    }
+
+    return b_vec;
+}
+
+std::array<long, 2> Simplex::Tableaux::getBFirstFloatIndex() const
+{
+    auto b_vector = this->getBVector();
+    long b_column = this->matrix_->getN()-1;
+
+    for (int i = 0; i < b_vector.size(); i++) {
+        if (b_vector[i]->getDenominator() != 1) {
+            return {i + 1, b_column};
+        }
+    }
+
+    return EMPTY_INDEXES;
 }

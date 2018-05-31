@@ -28,7 +28,7 @@ enum Solution {
     UNLIMITED
 };
 
-const std::array<int, 2> EMPTY_INDEXES = {-1, -1};
+const std::array<long, 2> EMPTY_INDEXES = {-1, -1};
 
 namespace Simplex {
 
@@ -61,9 +61,9 @@ namespace Simplex {
 
         SolveMethod getWhichSolveMethodApplies() const;
 
-        std::array<int, 2> getPrimalIndex() const;
+        std::array<long, 2> getPrimalIndex() const;
 
-        std::array<int, 2> getDualIndex() const;
+        std::array<long, 2> getDualIndex() const;
 
         bool stepPrimal(std::string file_output_steps);
 
@@ -71,11 +71,15 @@ namespace Simplex {
 
         void stepAux(std::string file_output_steps);
 
-        void pivot(const std::array<int, 2>& indexes, std::string file_output_steps);
+        void pivot(const std::array<long, 2>& indexes, std::string file_output_steps);
 
-        std::vector<std::array<int, 2>> getPivotedIndexes() const;
+        std::vector<std::array<long, 2>> getPivotedIndexes() const;
 
         void checkSolution();
+
+        std::vector<Fraction *> getBVector() const;
+
+        std::array<long, 2> getBFirstFloatIndex() const;
 
         std::vector<long double> getSolution() const;
 

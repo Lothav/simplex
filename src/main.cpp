@@ -31,17 +31,20 @@ int main(int argc, char** argv)
     int method_index = 0;
 
     if (file_data.size() == 4) {
-        type = file_data[method_index++] == 0 ? Type::INT_CUTTING_PLANE : Type::INT_CUTTING_PLANE;
+        type = file_data[method_index++] == "0" ? Type::INT_CUTTING_PLANE : Type::INT_BRANCH_N_BOUND;
     }
 
     auto matrix_m = std::stoi(file_data[method_index++]);
     auto matrix_n = std::stoi(file_data[method_index++]);
     auto matrix_cells = Simplex::File::GetIntsFromStringFile(file_data[method_index]);
 
-    // Generate matrix from input file.
-    auto tableaux = std::make_unique<Simplex::Tableaux>(matrix_m+1, matrix_n+1, matrix_cells, type);
-    tableaux->solve(STEP_WRITE_FILE);
-    tableaux->writeSolution(SOLUTION_WRITE_FILE);
+    // Tableaux Unique_Ptr scope.
+    {
+        // Generate matrix from input file.
+        auto tableaux = std::make_unique<Simplex::Tableaux>(matrix_m+1, matrix_n+1, std::move(matrix_cells), type);
+        tableaux->solve(STEP_WRITE_FILE);
+        tableaux->writeSolution(SOLUTION_WRITE_FILE);
+    }
 
     const clock_t end_time = std::clock();
     auto time_spent = static_cast<float>( (end_time - begin_time)) / CLOCKS_PER_SEC ;

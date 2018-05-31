@@ -15,7 +15,7 @@ Simplex::Matrix::Matrix(long m, long n, const std::vector<BigInt> &cells): m_(m)
     }
 }
 
-void Simplex::Matrix::updateCell(int i, int j, Fraction* cell)
+void Simplex::Matrix::updateCell(long i, long j, Fraction* cell)
 {
     if (i >= this->m_) {
         std::cerr << "Error trying update matrix. Invalid line index " << i << std::endl;
