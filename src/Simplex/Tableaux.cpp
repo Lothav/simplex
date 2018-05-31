@@ -224,11 +224,38 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
     }
 
     if (this->type_ == Type::INT_CUTTING_PLANE) {
+
         if (this->solution_ == Solution::VIABLE) {
+
             auto float_index = this->getBFirstFloatIndex();
-            std::cout << float_index[0] << " " << float_index[1] << std::endl;
+
+            std::vector<Fraction *> A_line = {};
+            for (auto line : this->getALine(float_index[0])) {
+                auto numerator = static_cast<long long int>(std::floor(line->getFloatValue()));
+                A_line.push_back(new Fraction(numerator, 1));
+            }
+
+
+
         }
     }
+}
+
+std::vector<Simplex::Fraction *> Simplex::Tableaux::getALine(long line_index) const
+{
+    auto matrix_cells = this->matrix_->getCells();
+
+    if (line_index > this->matrix_->getM()-1) {
+        throw std::invalid_argument("Invalid line_index in getALine() method!");
+    }
+
+    std::vector<Fraction *> A_line = {};
+
+    for (int i = 0; i < this->matrix_->getN()-this->matrix_->getM(); ++i) {
+        A_line.push_back(matrix_cells[line_index][i]);
+    }
+
+    return A_line;
 }
 
 void Simplex::Tableaux::checkSolution()

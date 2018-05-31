@@ -6,6 +6,7 @@
 #define SIMPLEX_TABLEAUX_HPP
 
 #include <array>
+#include <cmath>
 #include "Matrix.hpp"
 #include "File.hpp"
 
@@ -78,6 +79,8 @@ namespace Simplex {
         void checkSolution();
 
         std::vector<Fraction *> getBVector() const;
+
+        std::vector<Fraction *> getALine(long line_index) const;
 
         std::array<long, 2> getBFirstFloatIndex() const;
 
