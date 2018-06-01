@@ -46,7 +46,7 @@ void Simplex::Matrix::addColumn(long pos, std::vector<Fraction*> column)
 
 void Simplex::Matrix::addLine(long pos, std::vector<Fraction*> line)
 {
-    if (pos > this->getM()-1 || line.size() != this->getN()) {
+    if (pos > this->getM() || line.size() != this->getN()) {
         std::cerr << "Error adding line." << std::endl;
         return;
     }

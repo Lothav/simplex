@@ -230,7 +230,7 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
             auto float_index = this->getBFirstFloatIndex();
 
             std::vector<Fraction *> int_line = {};
-            for (auto line : this->getALine(float_index[0])) {
+            for (auto line : this->getLine(float_index[0])) {
                 auto numerator = static_cast<long long int>(std::floor(line->getFloatValue()));
                 int_line.push_back(new Fraction(numerator, 1));
             }
@@ -240,14 +240,15 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
             for (int i = 0; i < this->matrix_->getM()-1; ++i) {
                 int_column.push_back(new Fraction(0, 1));
             }
-            int_column.push_back(new Fraction(1, 0));
+            int_column.push_back(new Fraction(1, 1));
             this->matrix_->addColumn(this->matrix_->getN()-1, int_column);
 
+            std::cout << " ";
         }
     }
 }
 
-std::vector<Simplex::Fraction *> Simplex::Tableaux::getALine(long line_index) const
+std::vector<Simplex::Fraction *> Simplex::Tableaux::getLine(long line_index) const
 {
     auto matrix_cells = this->matrix_->getCells();
 
@@ -255,13 +256,13 @@ std::vector<Simplex::Fraction *> Simplex::Tableaux::getALine(long line_index) co
         throw std::invalid_argument("Invalid line_index in getALine() method!");
     }
 
-    std::vector<Fraction *> A_line = {};
+    std::vector<Fraction *> line = {};
 
-    for (int i = 0; i < this->matrix_->getN()-this->matrix_->getM(); ++i) {
-        A_line.push_back(matrix_cells[line_index][i]);
+    for (int i = 0; i < this->matrix_->getN(); ++i) {
+        line.push_back(matrix_cells[line_index][i]);
     }
 
-    return A_line;
+    return line;
 }
 
 void Simplex::Tableaux::checkSolution()

@@ -80,7 +80,7 @@ namespace Simplex {
 
         std::vector<Fraction *> getBVector() const;
 
-        std::vector<Fraction *> getALine(long line_index) const;
+        std::vector<Fraction *> getLine(long line_index) const;
 
         std::array<long, 2> getBFirstFloatIndex() const;
 
