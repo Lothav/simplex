@@ -229,13 +229,19 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
 
             auto float_index = this->getBFirstFloatIndex();
 
-            std::vector<Fraction *> A_line = {};
+            std::vector<Fraction *> int_line = {};
             for (auto line : this->getALine(float_index[0])) {
                 auto numerator = static_cast<long long int>(std::floor(line->getFloatValue()));
-                A_line.push_back(new Fraction(numerator, 1));
+                int_line.push_back(new Fraction(numerator, 1));
             }
+            this->matrix_->addLine(this->matrix_->getM(), int_line);
 
-
+            std::vector<Fraction *> int_column = {};
+            for (int i = 0; i < this->matrix_->getM()-1; ++i) {
+                int_column.push_back(new Fraction(0, 1));
+            }
+            int_column.push_back(new Fraction(1, 0));
+            this->matrix_->addColumn(this->matrix_->getN()-1, int_column);
 
         }
     }

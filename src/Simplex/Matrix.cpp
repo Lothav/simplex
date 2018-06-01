@@ -33,6 +33,7 @@ void Simplex::Matrix::updateCell(long i, long j, Fraction* cell)
 void Simplex::Matrix::addColumn(long pos, std::vector<Fraction*> column)
 {
     if (pos > this->getN()-1 || column.size() != this->getM()) {
+        std::cerr << "Error adding column." << std::endl;
         return;
     }
 
@@ -41,6 +42,18 @@ void Simplex::Matrix::addColumn(long pos, std::vector<Fraction*> column)
     }
 
     this->n_ += 1;
+}
+
+void Simplex::Matrix::addLine(long pos, std::vector<Fraction*> line)
+{
+    if (pos > this->getM()-1 || line.size() != this->getN()) {
+        std::cerr << "Error adding line." << std::endl;
+        return;
+    }
+
+    this->cells_.insert(this->cells_.begin() + pos, line);
+
+    this->m_ += 1;
 }
 
 void Simplex::Matrix::removeColumn(long column)

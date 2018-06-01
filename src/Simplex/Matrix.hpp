@@ -34,6 +34,8 @@ namespace Simplex
 
         void addColumn(long pos, std::vector<Fraction*> column);
 
+        void addLine(long pos, std::vector<Fraction*> line);
+
         void removeColumn(long column);
 
         std::string toString() const;
