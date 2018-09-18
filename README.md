@@ -1,1 +1,1 @@
-# simplex
+# Simplex
