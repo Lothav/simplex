@@ -49,7 +49,7 @@ std::vector<long> Simplex::File::GetIntsFromStringFile(std::string data_string)
     return data_int;
 }
 
-bool Simplex::File::checkFile(const std::vector<std::string>& file_stream)
+bool Simplex::File::checkFileComplete(const std::vector<std::string>& file_stream)
 {
     // Check file lines.
     bool valid = file_stream.size() == 3 || file_stream.size() == 4;

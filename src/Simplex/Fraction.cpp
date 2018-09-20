@@ -3,9 +3,12 @@
 //
 
 #include <cmath>
+#include <stdexcept>
+#include <iostream>
+#include <climits>
 #include "Fraction.hpp"
 
-Simplex::Fraction::Fraction(BigInt numerator, BigInt denominator) : numerator_(numerator), denominator_(denominator)
+Simplex::Fraction::Fraction(long long numerator, long long denominator) : numerator_(numerator), denominator_(denominator)
 {
     if (denominator_ == 0) {
         throw std::invalid_argument("Denominator can't be zero!");
@@ -78,58 +81,39 @@ Simplex::Fraction* Simplex::Fraction::operator +(const Fraction& fraction)
     return new Fraction((this->numerator_ * fraction.getDenominator()) + (fraction.getNumerator() * this->denominator_), this->denominator_ * fraction.getDenominator());
 }
 
-Simplex::Fraction* Simplex::Fraction::operator *(const BigInt& number)
+Simplex::Fraction* Simplex::Fraction::operator *(const long long& number)
 {
     return new Fraction(this->numerator_ * number, this->denominator_);
 }
 
-BigInt Simplex::Fraction::getNumerator() const
+long long Simplex::Fraction::getNumerator() const
 {
     return numerator_;
 }
 
-BigInt Simplex::Fraction::getDenominator() const
+long long Simplex::Fraction::getDenominator() const
 {
     return denominator_;
 }
 
 long double Simplex::Fraction::getFloatValue() const
 {
-    // We want to cast our division to 'long double'.
-    // But, it's possible only with primitive types (not BigInt).
-    // So we need check if both numerator and denominator fits into a 'long long int' (biggest type).
-    // If doesn't, divide both until it fits!
-
-    int division_rate = 2;
-
-    auto num_aux = this->numerator_;
-    auto den_aux = this->denominator_;
-
-    while ( num_aux > BigInt(LLONG_MAX) || den_aux > BigInt(LLONG_MAX) ||
-            num_aux < BigInt(LLONG_MIN) || den_aux < BigInt(LLONG_MIN))
-    {
-        num_aux /= division_rate;
-        den_aux /= division_rate;
-    }
-
-    auto division = static_cast<long double>(num_aux.toLongLong()) / static_cast<long double>(den_aux.toLongLong());
-
-    return division;
+    return static_cast<long double>(this->numerator_) / static_cast<long double>(this->denominator_);
 }
 
-BigInt Simplex::Fraction::gcd(const BigInt& a, const BigInt& b) const
+long long Simplex::Fraction::gcd(const long long& a, const long long& b) const
 {
     return b == 0 ? a : gcd(b, a % b);
 }
 
-BigInt Simplex::Fraction::gcm(const BigInt& a, const BigInt& b) const
+long long Simplex::Fraction::gcm(const long long& a, const long long& b) const
 {
     return (a * b) / gcd(a, b);
 }
 
 void Simplex::Fraction::simplify()
 {
-    BigInt gcd_ = gcd(this->numerator_, this->denominator_);
+    long long gcd_ = gcd(this->numerator_, this->denominator_);
 
     this->denominator_ /= gcd_;
     this->numerator_   /= gcd_;

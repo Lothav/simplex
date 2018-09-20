@@ -4,15 +4,14 @@
 
 #include "Tableaux.hpp"
 
-Simplex::Tableaux::Tableaux(long m, long n, const std::vector<long> &cells, Type type) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(Solution::NONE), type_(type)
+Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(Solution::NONE), type_(tableaux_input.type)
 {
-    std::vector<BigInt> bi;
-    for(auto bi_c: cells) {
-        BigInt a = bi_c;
-        bi.push_back(a);
+    std::vector<long long> bi;
+    for(auto bi_c: tableaux_input.cells) {
+        bi.push_back(bi_c);
     }
 
-    matrix_ = new Matrix(m, n, bi);
+    matrix_ = new Matrix(tableaux_input.m, tableaux_input.n, bi);
 
     this->addSlackVariables();
 

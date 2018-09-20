@@ -33,6 +33,13 @@ const std::array<long, 2> EMPTY_INDEXES = {-1, -1};
 
 namespace Simplex {
 
+    struct TableauxInput {
+        long m;
+        long n;
+        Type type;
+        const std::vector<long> &cells;
+    };
+
     class Tableaux
     {
 
@@ -46,7 +53,7 @@ namespace Simplex {
 
     public:
 
-        Tableaux(long m, long n, const std::vector<long> &cells, Type type);
+        explicit Tableaux(TableauxInput&& tableaux_input);
 
         void solve(std::string file_output_steps);
 

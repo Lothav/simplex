@@ -4,7 +4,7 @@
 
 #include "Matrix.hpp"
 
-Simplex::Matrix::Matrix(long m, long n, const std::vector<BigInt> &cells): m_(m), n_(n)
+Simplex::Matrix::Matrix(long m, long n, const std::vector<long long> &cells): m_(m), n_(n)
 {
     int i, j;
     for (i = 0 ; i < m_; i++) {

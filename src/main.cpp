@@ -12,10 +12,8 @@
 #define SOLUTION_WRITE_FILE "conclusao.txt"
 #define STEP_WRITE_FILE "pivoteamento.txt"
 
-int main(int argc, char** argv)
+Simplex::TableauxInput interfaceComplete(int argc, char** argv)
 {
-    const clock_t begin_time = std::clock();
-
     std::vector<std::string> file_data;
     if (argc > 1) {
         file_data = Simplex::File::GetFileData(argv[1]);
@@ -23,9 +21,9 @@ int main(int argc, char** argv)
         file_data = Simplex::File::GetStdInData();
     }
 
-    if (!Simplex::File::checkFile(file_data)) {
-        return EXIT_FAILURE;
-    }
+    if (!Simplex::File::checkFileComplete(file_data))
+        exit(EXIT_FAILURE);
+
 
     auto type = Type::NON_INT;
     int method_index = 0;
@@ -38,10 +36,50 @@ int main(int argc, char** argv)
     auto matrix_n = std::stoi(file_data[method_index++]);
     auto matrix_cells = Simplex::File::GetIntsFromStringFile(file_data[method_index]);
 
+    return Simplex::TableauxInput{
+        .m      = matrix_m,
+        .n      = matrix_n,
+        .type   = type,
+        .cells  = matrix_cells,
+    };
+}
+
+Simplex::TableauxInput interfaceSimple(int argc, char** argv)
+{
+    std::vector<std::string> file_data = Simplex::File::GetFileData(argv[1]);
+
+    //if (!Simplex::File::checkFileComplete(file_data))
+    //   exit(EXIT_FAILURE);
+
+    int method_index = 0;
+
+    auto matrix_m       = std::stoi(file_data[method_index++]);
+    auto matrix_n       = std::stoi(file_data[method_index++]);
+    auto matrix_cells   = Simplex::File::GetIntsFromStringFile(file_data[method_index]);
+
+    return Simplex::TableauxInput{
+        .m      = matrix_m,
+        .n      = matrix_n,
+        .type   = Type::NON_INT,
+        .cells  = matrix_cells,
+    };
+}
+
+
+int main(int argc, char** argv)
+{
+    const clock_t begin_time = std::clock();
+
     // Tableaux Unique_Ptr scope.
     {
         // Generate matrix from input file.
-        auto tableaux = std::make_unique<Simplex::Tableaux>(matrix_m+1, matrix_n+1, std::move(matrix_cells), type);
+        auto tableaux = std::make_unique<Simplex::Tableaux>(
+#ifdef INTERFACE_COMPLETE
+            interfaceComplete(argc, argv)
+#else
+            interfaceSimple(argc, argv)
+#endif
+        );
         tableaux->solve(STEP_WRITE_FILE);
         tableaux->writeSolution(SOLUTION_WRITE_FILE);
     }

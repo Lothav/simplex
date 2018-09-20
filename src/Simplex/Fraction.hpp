@@ -6,9 +6,6 @@
 #define SIMPLEX_FRACTION_HPP
 
 #include <algorithm>
-#include "../../external/Inifity.hpp"
-
-typedef InfInt BigInt;
 
 namespace Simplex
 {
@@ -17,12 +14,12 @@ namespace Simplex
 
     private:
 
-        BigInt numerator_;
-        BigInt denominator_;
+        long long numerator_;
+        long long denominator_;
 
     public:
 
-        Fraction(BigInt numerator, BigInt denominator);
+        Fraction(long long numerator, long long denominator);
 
         bool operator <(const long double& number);
 
@@ -38,7 +35,7 @@ namespace Simplex
 
         bool operator >(const Fraction& fraction);
 
-        Fraction* operator *(const BigInt& number);
+        Fraction* operator *(const long long& number);
 
         Fraction* operator *(const Fraction& fraction);
 
@@ -48,17 +45,17 @@ namespace Simplex
 
         Fraction* operator +(const Fraction& fraction);
 
-        BigInt getNumerator() const;
+        long long getNumerator() const;
 
-        BigInt getDenominator() const;
+        long long getDenominator() const;
 
         long double getFloatValue() const;
 
     private:
 
-        BigInt gcd(const BigInt& a, const BigInt& b) const;
+        long long gcd(const long long& a, const long long& b) const;
 
-        BigInt gcm(const BigInt& a, const BigInt& b) const;
+        long long gcm(const long long& a, const long long& b) const;
 
         void simplify();
 
