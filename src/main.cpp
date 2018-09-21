@@ -86,7 +86,6 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
 int main(int argc, char** argv)
 {
     const clock_t begin_time = std::clock();
-
     // Tableaux Unique_Ptr scope.
     {
         // Generate matrix from input file.
@@ -100,7 +99,6 @@ int main(int argc, char** argv)
         tableaux->solve(STEP_WRITE_FILE);
         tableaux->writeSolution(SOLUTION_WRITE_FILE);
     }
-
     const clock_t end_time = std::clock();
     auto time_spent = static_cast<float>( end_time - begin_time) / CLOCKS_PER_SEC;
     std::cout << "Finished. Took " << time_spent << "s." << std::endl;

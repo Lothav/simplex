@@ -11,7 +11,23 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
         bi.push_back(bi_c);
     }
 
-    matrix_ = new Matrix(tableaux_input.m, tableaux_input.n, bi);
+    matrix_ = std::make_unique<Matrix>(tableaux_input.m, tableaux_input.n, bi);
+
+    if (tableaux_input.is_non_negative.empty()) {
+        for (int i = 0; i < tableaux_input.n-1; ++i) {
+            is_non_negative_.push_back(true);
+        }
+    } else {
+        is_non_negative_ = tableaux_input.is_non_negative;
+    }
+
+    if (tableaux_input.operators.empty()) {
+        for (int i = 0; i < tableaux_input.n-1; ++i) {
+            operators_.push_back(Operator::LESS_EQUAL);
+        }
+    } else {
+        operators_ = tableaux_input.operators;
+    }
 
     this->addSlackVariables();
 
@@ -31,14 +47,19 @@ void Simplex::Tableaux::addSlackVariables()
     // Iterate columns.
     for (int j = 0; j < this->matrix_->getM()-1; ++j) {
 
+        // Equal operator doesn't need a slack variable.
+        if (operators_[j] == Operator::EQUAL) {
+            continue;
+        }
+
         std::vector<Fraction*> column = {};
 
         // Iterate lines.
         for (int i = 0; i < this->matrix_->getM(); ++i) {
 
-            // If line is 0, all columns is 0.
+            // If line is 0, all columns are 0.
             // If line != 0, if column+1 == line then 1 else 0.
-            long slack_var_num = ((i != 0) && (i == j + 1)) ? 1 : 0;
+            long slack_var_num = ((i != 0) && (i == j + 1)) ? (operators_[j] == Operator::LESS_EQUAL ? 1 : -1) : 0;
 
             // Generate slack variable fraction.
             auto slack_var_element = new Fraction(slack_var_num, 1);

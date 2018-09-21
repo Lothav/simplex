@@ -67,11 +67,12 @@ namespace Simplex {
 
     private:
 
-        Type        type_;
-        SolveMethod solve_method_;
-        Matrix*     matrix_;
-        Solution    solution_;
-
+        Type                    type_;
+        SolveMethod             solve_method_;
+        std::unique_ptr<Matrix> matrix_;
+        Solution                solution_;
+        std::vector<Operator>   operators_ = {};
+        std::vector<bool>       is_non_negative_ = {};
 
     public:
 
