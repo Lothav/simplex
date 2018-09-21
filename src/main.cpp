@@ -46,9 +46,6 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
 {
     std::vector<std::string> file_data = Simplex::File::GetFileData(argv[1]);
 
-    //if (!Simplex::File::checkFileComplete(file_data))
-    //   exit(EXIT_FAILURE);
-
     auto variables_count    = std::stoi(file_data[0]);
     auto restrictions_count = std::stoi(file_data[1]);
 
@@ -58,9 +55,9 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
         is_non_negative.push_back(non_negative_i == 1);
     }
 
-    auto objective_fn = Simplex::File::GetIntsFromStringFile(std::move(file_data[3]));
     std::vector<Simplex::Operator> operators = {};
-    std::vector<long> cells = {};
+    std::vector<long> cells = Simplex::File::GetIntsFromStringFile(std::move(file_data[3]));
+    cells.push_back(0); // Initial Objective value
     for (int i = 0; i < restrictions_count; ++i) {
         auto restriction_line = Simplex::File::GetSplitStringsFromStringFile(std::move(file_data[4+i]));
         for (auto &restriction_item : restriction_line){
@@ -77,8 +74,8 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
     }
 
     return Simplex::TableauxInput{
-        .m                  = restrictions_count,
-        .n                  = variables_count,
+        .m                  = restrictions_count + 1,
+        .n                  = variables_count + 1,
         .type               = Type::NON_INT,
         .cells              = cells,
         .operators          = operators,
@@ -106,8 +103,8 @@ int main(int argc, char** argv)
 
     const clock_t end_time = std::clock();
     auto time_spent = static_cast<float>( end_time - begin_time) / CLOCKS_PER_SEC;
-    std::cout << "Finished. Took " << time_spent << "s" << std::endl;
-    std::cout << "\tThe results was written in '"<< SOLUTION_WRITE_FILE << "'." << std::endl;
+    std::cout << "Finished. Took " << time_spent << "s." << std::endl;
+    std::cout << "\tThe results was written in '" << SOLUTION_WRITE_FILE << "'." << std::endl;
     std::cout << "\tMatrix steps was written in '" << STEP_WRITE_FILE << "'." << std::endl;
 
     return EXIT_SUCCESS;

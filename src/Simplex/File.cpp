@@ -54,7 +54,7 @@ std::vector<std::string> Simplex::File::GetSplitStringsFromStringFile(std::strin
     std::vector<std::string> result;
     std::istringstream iss(data_string);
 
-    for (std::string token; std::getline(iss, token, '');) {
+    for (std::string token; std::getline(iss, token, ' ');) {
         result.push_back(std::move(token));
     }
     return result;
