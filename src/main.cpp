@@ -21,9 +21,7 @@ Simplex::TableauxInput interfaceComplete(int argc, char** argv)
         file_data = Simplex::File::GetStdInData();
     }
 
-    if (!Simplex::File::checkFileComplete(file_data))
-        exit(EXIT_FAILURE);
-
+    if (!Simplex::File::checkFileComplete(file_data)) exit(EXIT_FAILURE);
 
     auto type = Type::NON_INT;
     int method_index = 0;
@@ -32,9 +30,9 @@ Simplex::TableauxInput interfaceComplete(int argc, char** argv)
         type = file_data[method_index++] == "0" ? Type::INT_CUTTING_PLANE : Type::INT_BRANCH_N_BOUND;
     }
 
-    auto matrix_m = std::stoi(file_data[method_index++]);
-    auto matrix_n = std::stoi(file_data[method_index++]);
-    auto matrix_cells = Simplex::File::GetIntsFromStringFile(file_data[method_index]);
+    auto matrix_m       = std::stoi(file_data[method_index++]);
+    auto matrix_n       = std::stoi(file_data[method_index++]);
+    auto matrix_cells   = Simplex::File::GetIntsFromStringFile(std::move(file_data[method_index]));
 
     return Simplex::TableauxInput{
         .m      = matrix_m,
@@ -51,20 +49,42 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
     //if (!Simplex::File::checkFileComplete(file_data))
     //   exit(EXIT_FAILURE);
 
-    int method_index = 0;
+    auto variables_count    = std::stoi(file_data[0]);
+    auto restrictions_count = std::stoi(file_data[1]);
 
-    auto matrix_m       = std::stoi(file_data[method_index++]);
-    auto matrix_n       = std::stoi(file_data[method_index++]);
-    auto matrix_cells   = Simplex::File::GetIntsFromStringFile(file_data[method_index]);
+    auto non_negative = Simplex::File::GetIntsFromStringFile(std::move(file_data[2]));
+    std::vector<bool> is_non_negative = {};
+    for (auto non_negative_i : non_negative) {
+        is_non_negative.push_back(non_negative_i == 1);
+    }
+
+    auto objective_fn = Simplex::File::GetIntsFromStringFile(std::move(file_data[3]));
+    std::vector<Simplex::Operator> operators = {};
+    std::vector<long> cells = {};
+    for (int i = 0; i < restrictions_count; ++i) {
+        auto restriction_line = Simplex::File::GetSplitStringsFromStringFile(std::move(file_data[4+i]));
+        for (auto &restriction_item : restriction_line){
+            if(restriction_item == "<="){
+                operators.push_back(Simplex::Operator::LESS_EQUAL);
+            } else if (restriction_item == ">=") {
+                operators.push_back(Simplex::Operator::GREATHER_EQUAL);
+            } else if (restriction_item == "=" || restriction_item == "==") {
+                operators.push_back(Simplex::Operator::EQUAL);
+            } else {
+                cells.push_back(std::strtol(restriction_item.c_str(), nullptr, 10));
+            }
+        }
+    }
 
     return Simplex::TableauxInput{
-        .m      = matrix_m,
-        .n      = matrix_n,
-        .type   = Type::NON_INT,
-        .cells  = matrix_cells,
+        .m                  = restrictions_count,
+        .n                  = variables_count,
+        .type               = Type::NON_INT,
+        .cells              = cells,
+        .operators          = operators,
+        .is_non_negative    = is_non_negative,
     };
 }
-
 
 int main(int argc, char** argv)
 {
@@ -85,7 +105,7 @@ int main(int argc, char** argv)
     }
 
     const clock_t end_time = std::clock();
-    auto time_spent = static_cast<float>( (end_time - begin_time)) / CLOCKS_PER_SEC ;
+    auto time_spent = static_cast<float>( end_time - begin_time) / CLOCKS_PER_SEC;
     std::cout << "Finished. Took " << time_spent << "s" << std::endl;
     std::cout << "\tThe results was written in '"<< SOLUTION_WRITE_FILE << "'." << std::endl;
     std::cout << "\tMatrix steps was written in '" << STEP_WRITE_FILE << "'." << std::endl;

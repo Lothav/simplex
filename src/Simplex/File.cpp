@@ -34,7 +34,7 @@ void Simplex::File::WriteOnFile(std::string path, std::string data)
     out_file.close();
 }
 
-std::vector<long> Simplex::File::GetIntsFromStringFile(std::string data_string)
+std::vector<long> Simplex::File::GetIntsFromStringFile(std::string&& data_string)
 {
     std::vector<long> data_int = {};
 
@@ -47,6 +47,17 @@ std::vector<long> Simplex::File::GetIntsFromStringFile(std::string data_string)
     }
 
     return data_int;
+}
+
+std::vector<std::string> Simplex::File::GetSplitStringsFromStringFile(std::string&& data_string)
+{
+    std::vector<std::string> result;
+    std::istringstream iss(data_string);
+
+    for (std::string token; std::getline(iss, token, '');) {
+        result.push_back(std::move(token));
+    }
+    return result;
 }
 
 bool Simplex::File::checkFileComplete(const std::vector<std::string>& file_stream)

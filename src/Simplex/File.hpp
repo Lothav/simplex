@@ -27,7 +27,9 @@ namespace Simplex
 
         static void WriteOnFile(std::string path, std::string data);
 
-        static std::vector<long> GetIntsFromStringFile(std::string data_string);
+        static std::vector<long> GetIntsFromStringFile(std::string&& data_string);
+
+        static std::vector<std::string> GetSplitStringsFromStringFile(std::string&& data_string);
 
         static bool checkFileComplete(const std::vector<std::string>& file_stream);
 

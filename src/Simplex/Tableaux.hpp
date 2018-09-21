@@ -33,11 +33,33 @@ const std::array<long, 2> EMPTY_INDEXES = {-1, -1};
 
 namespace Simplex {
 
+    enum Operator {
+        EQUAL           = 0,
+        LESS_EQUAL      = 1,
+        GREATHER_EQUAL  = 2,
+    };
+
     struct TableauxInput {
-        long m;
-        long n;
-        Type type;
-        const std::vector<long> &cells;
+        // Tableaux lines
+        long m = 0;
+
+        // Tableaux columns.
+        long n = 0;
+
+        // Type default NON_INT: means that result can be float (non-integer).
+        Type type = Type::NON_INT;
+
+        // Tableaux cells.
+        // Must contain objective function and restrictions.
+        const std::vector<long>& cells = {};
+
+        // Operators vector size must be equal 'm'-1.
+        // It's restrictions lines operators.
+        const std::vector<Operator>& operators = {};
+
+        // Operators vector size must be equal 'n'-1.
+        // If empty, default true, for every variable.
+        const std::vector<bool>& is_non_negative = {};
     };
 
     class Tableaux
