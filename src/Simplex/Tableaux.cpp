@@ -17,7 +17,7 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
         is_non_negative_ = tableaux_input.is_non_negative;
     }
 
-    this->addSlackVariables(tableaux_input.operators, tableaux_input.is_non_negative);
+    this->addSlackVariables(tableaux_input.operators);
 
     std::cout << matrix_->toString() << std::endl;
 
@@ -28,7 +28,7 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
     }
 }
 
-void Simplex::Tableaux::addSlackVariables(std::vector<Operator> operators, std::vector<bool> is_non_negative)
+void Simplex::Tableaux::addSlackVariables(std::vector<Operator> operators)
 {
     // Insert [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]] vector like in matrix.
     // It corresponds to slack variables (before 'b' vector).
