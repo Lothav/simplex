@@ -56,8 +56,9 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
     }
 
     std::vector<Simplex::Operator> operators = {};
-    std::vector<long> cells = Simplex::File::GetIntsFromStringFile(std::move(file_data[3]));
+    std::vector<long long> cells = Simplex::File::GetIntsFromStringFile(std::move(file_data[3]));
     cells.push_back(0); // Initial Objective value
+
     for (int i = 0; i < restrictions_count; ++i) {
         auto restriction_line = Simplex::File::GetSplitStringsFromStringFile(std::move(file_data[4+i]));
         for (auto &restriction_item : restriction_line){

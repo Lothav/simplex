@@ -6,14 +6,10 @@
 
 Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(Solution::NONE), type_(tableaux_input.type)
 {
-    std::vector<long long> bi;
-    for(auto bi_c: tableaux_input.cells) {
-        bi.push_back(bi_c);
-    }
-
-    matrix_ = std::make_unique<Matrix>(tableaux_input.m, tableaux_input.n, bi);
+    matrix_ = std::make_unique<Matrix>(tableaux_input.m, tableaux_input.n, tableaux_input.cells);
 
     if (tableaux_input.is_non_negative.empty()) {
+        // If its empty, insert default 'true' for every variable.
         for (int i = 0; i < tableaux_input.n-1; ++i) {
             is_non_negative_.push_back(true);
         }
@@ -21,15 +17,9 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
         is_non_negative_ = tableaux_input.is_non_negative;
     }
 
-    if (tableaux_input.operators.empty()) {
-        for (int i = 0; i < tableaux_input.n-1; ++i) {
-            operators_.push_back(Operator::LESS_EQUAL);
-        }
-    } else {
-        operators_ = tableaux_input.operators;
-    }
+    this->addSlackVariables(tableaux_input.operators, tableaux_input.is_non_negative);
 
-    this->addSlackVariables();
+    std::cout << matrix_->toString() << std::endl;
 
     // Iterate in first matrix column. Set all elements to negative.
     for (int j = 0; j < matrix_->getN(); ++j) {
@@ -38,17 +28,21 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
     }
 }
 
-void Simplex::Tableaux::addSlackVariables()
+void Simplex::Tableaux::addSlackVariables(std::vector<Operator> operators, std::vector<bool> is_non_negative)
 {
     // Insert [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]] vector like in matrix.
     // It corresponds to slack variables (before 'b' vector).
     // First line we will get our certifies.
 
-    // Iterate columns.
+    while (operators.size() < this->matrix_->getM()) {
+        operators.push_back(Operator::LESS_EQUAL);
+    }
+
+    // Iterate columns that must be add.
     for (int j = 0; j < this->matrix_->getM()-1; ++j) {
 
         // Equal operator doesn't need a slack variable.
-        if (operators_[j] == Operator::EQUAL) {
+        if (operators[j] == Operator::EQUAL) {
             continue;
         }
 
@@ -59,7 +53,7 @@ void Simplex::Tableaux::addSlackVariables()
 
             // If line is 0, all columns are 0.
             // If line != 0, if column+1 == line then 1 else 0.
-            long slack_var_num = ((i != 0) && (i == j + 1)) ? (operators_[j] == Operator::LESS_EQUAL ? 1 : -1) : 0;
+            long slack_var_num = ((i != 0) && (i == j + 1)) ? (operators[j] == Operator::LESS_EQUAL ? 1 : -1) : 0;
 
             // Generate slack variable fraction.
             auto slack_var_element = new Fraction(slack_var_num, 1);
@@ -82,7 +76,7 @@ void Simplex::Tableaux::removeSlackVariables()
 
 void Simplex::Tableaux::stepAux(std::string file_output_steps)
 {
-    this->addSlackVariables();
+    this->addSlackVariables({});
 
     for (int k = 0; k < this->matrix_->getN()-1; ++k) {
         this->matrix_->updateCell(0, k, new Fraction(0, 1));

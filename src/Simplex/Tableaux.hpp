@@ -41,25 +41,25 @@ namespace Simplex {
 
     struct TableauxInput {
         // Tableaux lines
-        long m = 0;
+        const long m = 0;
 
         // Tableaux columns.
-        long n = 0;
+        const long n = 0;
 
         // Type default NON_INT: means that result can be float (non-integer).
-        Type type = Type::NON_INT;
+        const Type type = Type::NON_INT;
 
         // Tableaux cells.
         // Must contain objective function and restrictions.
-        const std::vector<long>& cells = {};
+        const std::vector<long long> cells = {};
 
         // Operators vector size must be equal 'm'-1.
         // It's restrictions lines operators.
-        const std::vector<Operator>& operators = {};
+        const std::vector<Operator> operators = {};
 
         // Operators vector size must be equal 'n'-1.
         // If empty, default true, for every variable.
-        const std::vector<bool>& is_non_negative = {};
+        const std::vector<bool> is_non_negative = {};
     };
 
     class Tableaux
@@ -71,7 +71,6 @@ namespace Simplex {
         SolveMethod             solve_method_;
         std::unique_ptr<Matrix> matrix_;
         Solution                solution_;
-        std::vector<Operator>   operators_ = {};
         std::vector<bool>       is_non_negative_ = {};
 
     public:
@@ -84,7 +83,7 @@ namespace Simplex {
 
     private:
 
-        void addSlackVariables();
+        void addSlackVariables(std::vector<Operator> operators, std::vector<bool> is_non_negative);
 
         void removeSlackVariables();
 
