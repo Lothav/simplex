@@ -11,9 +11,7 @@
 #include "File.hpp"
 
 enum Type {
-    NON_INT,
-    INT_CUTTING_PLANE,
-    INT_BRANCH_N_BOUND
+    NON_INT
 };
 
 enum SolveMethod {
