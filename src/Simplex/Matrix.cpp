@@ -78,7 +78,7 @@ void Simplex::Matrix::removeColumn(long column)
         return;
     }
 
-    for (int k = 0; k < this->getM()-1; ++k) {
+    for (int k = 0; k < this->getM(); ++k) {
         this->cells_[k].erase(this->cells_[k].begin() + column);
     }
 

@@ -7,6 +7,7 @@
 #include <cstring>
 #include <vector>
 #include <regex>
+#include <climits>
 #include "Simplex/Tableaux.hpp"
 
 #define SOLUTION_WRITE_FILE "conclusao.txt"
@@ -32,8 +33,16 @@ Simplex::TableauxInput readFileData(int argc, char** argv)
 
     // Set cells with objective function line
     for (auto &obj_value: obj_values) {
-        auto value = std::strtod(obj_value.c_str(), nullptr);
-        cells.push_back(value);
+
+        errno = 0;
+        char *endptr;
+        auto *nptr = const_cast<char*>(obj_value.c_str());
+
+        auto number = std::strtod(nptr, &endptr);
+
+        if (errno == 0 && nptr != endptr) {
+            cells.push_back(number);
+        }
     }
     cells.push_back(0); // Initial Objective value
 

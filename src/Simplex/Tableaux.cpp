@@ -115,7 +115,7 @@ void Simplex::Tableaux::stepAux(std::string file_output_steps)
         }
     }
 
-    File::WriteOnFile(file_output_steps, "Pivot with Primal Algorithm:\n");
+    File::WriteOnFile(file_output_steps, "Pivot Aux with Primal Algorithm:\n");
     while (stepPrimal(file_output_steps));
 
     this->removeSlackVariables();
@@ -151,6 +151,10 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
     if (objective_value == 0) {
 
         // Get pivoted indexes.
+        auto indexes = this->getPivotedIndexes();
+
+        File::WriteOnFile(file_output_steps, "Solution found on Aux Matrix:\n");
+        this->matrix_->printMatrixOnFile(file_output_steps);
 
         // Recover matrix from backup.
         for (int l = 0; l < this->matrix_->getM(); ++l) {
@@ -159,11 +163,8 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
             }
         }
 
-        File::WriteOnFile(file_output_steps, "Solution found on Aux Matrix. Build original with Aux base:\n");
+        File::WriteOnFile(file_output_steps, "Build original with Aux base:\n");
         this->matrix_->printMatrixOnFile(file_output_steps);
-
-        auto indexes = this->getPivotedIndexes();
-
 
         // Pivot found indexes.
         File::WriteOnFile(file_output_steps, "Pivot original with Aux base:\n");
@@ -249,6 +250,9 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
     std::ofstream ofs;
     ofs.open(file_output_steps, std::ofstream::out | std::ofstream::trunc);
     ofs.close();
+
+    File::WriteOnFile(file_output_steps,"Original Matrix:\n");
+    File::WriteOnFile(file_output_steps, this->matrix_->toString());
 
     this->solve_method_ = this->getWhichSolveMethodApplies();
 
@@ -387,7 +391,7 @@ std::array<long, 2> Simplex::Tableaux::getPrimalIndex() const
         // Check if 'c' is negative.
         if (c_element < 0) {
 
-            Fraction lower(0, 1);
+            Fraction lower(INT32_MAX, 1);
 
             // Iterate in 'b' vector elements
             for (int j = 1; j < matrix_->getM(); ++j) {
@@ -407,17 +411,19 @@ std::array<long, 2> Simplex::Tableaux::getPrimalIndex() const
                 auto b_divided_by_A = *(b_element/A_element);
 
                 // Find lower 'b' element divided by 'A' element.
-                if (index == EMPTY_INDEXES || b_divided_by_A < lower) {
+                if (b_divided_by_A < lower) {
                     index = {j, i};
                     lower = b_divided_by_A;
                 }
             }
 
-            break;
+            if(index != EMPTY_INDEXES) {
+                return index;
+            }
         }
     }
 
-    return index;
+    return EMPTY_INDEXES;
 }
 
 std::array<long, 2> Simplex::Tableaux::getDualIndex() const
