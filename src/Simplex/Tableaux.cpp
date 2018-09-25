@@ -105,6 +105,9 @@ void Simplex::Tableaux::stepAux(std::string file_output_steps)
         this->matrix_->updateCell(0, static_cast<int>(k), new Fraction(1, 1));
     }
 
+    File::WriteOnFile(file_output_steps, "Build Aux Matrix:\n");
+    this->matrix_->printMatrixOnFile(file_output_steps);
+    File::WriteOnFile(file_output_steps, "Put in Canonical Form:\n");
     for (int i = 1; i < this->matrix_->getM(); ++i) {
         for (long k = this->matrix_->getN()-2; k > this->matrix_->getN()-1-this->matrix_->getM(); --k) {
             auto matrix_cells = this->matrix_->getCells();
@@ -114,6 +117,7 @@ void Simplex::Tableaux::stepAux(std::string file_output_steps)
         }
     }
 
+    File::WriteOnFile(file_output_steps, "Pivot with Primal Algorithm:\n");
     while (stepPrimal(file_output_steps));
 
     this->removeSlackVariables();
@@ -157,11 +161,14 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
             }
         }
 
+        File::WriteOnFile(file_output_steps, "Solution found on Aux Matrix. Build original with Aux base:\n");
         this->matrix_->printMatrixOnFile(file_output_steps);
 
         auto indexes = this->getPivotedIndexes();
 
+
         // Pivot found indexes.
+        File::WriteOnFile(file_output_steps, "Pivot original with Aux base:\n");
         for (auto index_ : indexes) {
             this->pivot(index_, file_output_steps);
         }
@@ -178,7 +185,7 @@ long double Simplex::Tableaux::getObjectiveValue() const
 std::vector<std::array<long, 2>> Simplex::Tableaux::getPivotedIndexes() const
 {
     std::vector<std::array<long,2>> indexes = {};
-    std::array<long, 2> index = EMPTY_INDEXES;
+    std::array<long, 2> index;
 
     auto matrix_cells = this->matrix_->getCells();
 
@@ -188,8 +195,7 @@ std::vector<std::array<long, 2>> Simplex::Tableaux::getPivotedIndexes() const
         for (int i = 0; i < this->matrix_->getM(); ++i) {
             if (*matrix_cells[i][j] == 1 && index == EMPTY_INDEXES) {
                 index = {i, j};
-            }
-            else if (*matrix_cells[i][j] == 0) {
+            } else if (*matrix_cells[i][j] == 0) {
                 count_zeros++;
             }
         }
