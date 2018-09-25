@@ -8,14 +8,7 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
 {
     matrix_ = std::make_unique<Matrix>(tableaux_input.m, tableaux_input.n, tableaux_input.cells);
 
-    if (tableaux_input.is_non_negative.empty()) {
-        // If its empty, insert default 'true' for every variable.
-        for (int i = 0; i < tableaux_input.n-1; ++i) {
-            is_non_negative_.push_back(true);
-        }
-    } else {
-        is_non_negative_ = tableaux_input.is_non_negative;
-    }
+    this->convertToStandardForm(tableaux_input.is_non_negative);
 
     this->addSlackVariables(tableaux_input.operators);
 
