@@ -428,6 +428,9 @@ std::array<long, 2> Simplex::Tableaux::getPrimalIndex() const
 
                 // Get 'b' vector element.
                 Fraction b_element = *matrix_cells[j][matrix_->getN()-1];
+                if (b_element <= 0) {
+                    continue;
+                }
 
                 auto b_divided_by_A = *(b_element/A_element);
 

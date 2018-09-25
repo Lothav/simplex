@@ -89,6 +89,20 @@ std::string Simplex::Matrix::toString() const
 {
     std::string matrix_string = "[";
 
+    // Get max length number string.
+    // This will be used to generate constant spaces between numbers when generate string it.
+    ulong max_length = 0;
+    for (int i = 0; i < this->getM(); ++i) {
+        for (int j = 0; j < this->getN(); ++j) {
+            long double value = this->cells_[i][j]->getFloatValue();
+            auto cell_string = std::to_string(value);
+            if (cell_string.length() > max_length) {
+                max_length = cell_string.length();
+            }
+        }
+    }
+
+    // Generate matrix string.
     for (int i = 0; i < this->getM(); ++i) {
 
         matrix_string += "[";
@@ -98,7 +112,7 @@ std::string Simplex::Matrix::toString() const
 
             auto cell_string = std::to_string(value);
 
-            auto total_space = (i == 0 && j == 0 ? 10 : 11) - cell_string.length();
+            auto total_space = (i == 0 && j == 0 ? max_length : max_length+1) - cell_string.length();
             while (total_space > 0) {
                 matrix_string += ' ';
                 total_space--;
