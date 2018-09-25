@@ -28,6 +28,23 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
     }
 }
 
+void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_negative)
+{
+    auto matrix_cells = this->matrix_->getCells();
+
+    // Add an negative variable for each variable that doesn't have a non-negative restriction.
+    for (int k = 0; k < is_non_negative.size(); ++k) {
+        if (!is_non_negative[k]) {
+            std::vector<Fraction*> column = {};
+            for (int i = 0; i < this->matrix_->getM(); ++i) {
+                column.push_back(new Fraction(-*matrix_cells[i][k], 1));
+            }
+            this->matrix_->addColumn(this->matrix_->getN()-1, column);
+        }
+    }
+
+}
+
 void Simplex::Tableaux::addSlackVariables(std::vector<Operator> operators)
 {
     // Insert [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]] vector like in matrix.

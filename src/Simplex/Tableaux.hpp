@@ -83,10 +83,7 @@ namespace Simplex {
 
     private:
 
-        void convertToStandardForm(const std::vector<bool>& is_non_negative)
-        {
-
-        }
+        void convertToStandardForm(const std::vector<bool>& is_non_negative);
 
         void addSlackVariables(std::vector<Operator> operators);
 
