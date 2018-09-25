@@ -65,7 +65,7 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
             if(restriction_item == "<="){
                 operators.push_back(Simplex::Operator::LESS_EQUAL);
             } else if (restriction_item == ">=") {
-                operators.push_back(Simplex::Operator::GREATHER_EQUAL);
+                operators.push_back(Simplex::Operator::GREATER_EQUAL);
             } else if (restriction_item == "=" || restriction_item == "==") {
                 operators.push_back(Simplex::Operator::EQUAL);
             } else {

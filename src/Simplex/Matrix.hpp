@@ -40,6 +40,7 @@ namespace Simplex
 
         std::string toString() const;
 
+        void printMatrixOnFile(std::string file_output) const;
     };
 }
 

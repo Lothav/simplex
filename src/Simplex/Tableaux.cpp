@@ -12,13 +12,13 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
 
     this->addSlackVariables(tableaux_input.operators);
 
-    std::cout << matrix_->toString() << std::endl;
-
     // Iterate in first matrix column. Set all elements to negative.
     for (int j = 0; j < matrix_->getN(); ++j) {
         auto element = matrix_->getCells()[0][j];
         matrix_->updateCell(0, j, new Fraction(element->getNumerator() * -1, element->getDenominator()));
     }
+
+    std::cout << "Tableaux:" << std::endl << matrix_->toString() << std::endl;
 }
 
 void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_negative)
@@ -28,9 +28,9 @@ void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_ne
     // Add an negative variable for each variable that doesn't have a non-negative restriction.
     for (int k = 0; k < is_non_negative.size(); ++k) {
         if (!is_non_negative[k]) {
-            std::vector<Fraction*> column = {};
-            for (int i = 0; i < this->matrix_->getM(); ++i) {
-                column.push_back(new Fraction(-*matrix_cells[i][k], 1));
+            std::vector<Fraction*> column = {new Fraction(0, 1)};
+            for (int i = 1; i < this->matrix_->getM(); ++i) {
+                column.push_back(new Fraction(matrix_cells[i][k]->getNumerator() * -1, matrix_cells[i][k]->getDenominator()));
             }
             this->matrix_->addColumn(this->matrix_->getN()-1, column);
         }
@@ -63,7 +63,16 @@ void Simplex::Tableaux::addSlackVariables(std::vector<Operator> operators)
 
             // If line is 0, all columns are 0.
             // If line != 0, if column+1 == line then 1 else 0.
-            long slack_var_num = ((i != 0) && (i == j + 1)) ? (operators[j] == Operator::LESS_EQUAL ? 1 : -1) : 0;
+            long slack_var_num = 0;
+            if ((i != 0) && (i == j + 1)) {
+                slack_var_num = 1;
+                // Multiply all line by -1 so we have an canonical base.
+                if (operators[j] == Operator::GREATER_EQUAL) {
+                    for (int k = 0; k < this->matrix_->getN(); ++k) {
+                        this->matrix_->updateCell(i, k, *matrix_->getCells()[i][k] * -1);
+                    }
+                }
+            }
 
             // Generate slack variable fraction.
             auto slack_var_element = new Fraction(slack_var_num, 1);
@@ -136,7 +145,7 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
     this->stepAux(file_output_steps);
 
     // Check if objective value equal zero.
-    auto objective_value = *this->matrix_->getCells()[0][this->matrix_->getN()-1];
+    auto objective_value = getObjectiveValue();
     if (objective_value == 0) {
 
         // Get pivoted indexes.
@@ -147,6 +156,8 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
                 this->matrix_->updateCell(l, i, backup_matrix[l][i]);
             }
         }
+
+        this->matrix_->printMatrixOnFile(file_output_steps);
 
         auto indexes = this->getPivotedIndexes();
 
@@ -159,20 +170,30 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
     }
 }
 
+long double Simplex::Tableaux::getObjectiveValue() const
+{
+    return this->matrix_->getCells()[0][this->matrix_->getN()-1]->getFloatValue();
+}
+
 std::vector<std::array<long, 2>> Simplex::Tableaux::getPivotedIndexes() const
 {
     std::vector<std::array<long,2>> indexes = {};
     std::array<long, 2> index = EMPTY_INDEXES;
 
+    auto matrix_cells = this->matrix_->getCells();
+
     for (int j = 0; j < this->matrix_->getN()-1; ++j) {
-        int count_one = 0;
-        for (int i = 1; i < this->matrix_->getM(); ++i) {
-            if (*this->matrix_->getCells()[i][j] == 1) {
+        int count_zeros = 0;
+        index = EMPTY_INDEXES;
+        for (int i = 0; i < this->matrix_->getM(); ++i) {
+            if (*matrix_cells[i][j] == 1 && index == EMPTY_INDEXES) {
                 index = {i, j};
-                count_one++;
+            }
+            else if (*matrix_cells[i][j] == 0) {
+                count_zeros++;
             }
         }
-        if (count_one == 1) {
+        if (count_zeros == this->matrix_->getM()-1 && index != EMPTY_INDEXES) {
             indexes.push_back(index);
         }
     }
@@ -583,9 +604,7 @@ void Simplex::Tableaux::pivot(const std::array<long, 2>& indexes, std::string fi
         }
     }
 
-    // Pivot finished. Write modifications on 'file_output_steps' file.
-    std::string matrix_str = this->matrix_->toString();
-    Simplex::File::WriteOnFile(file_output_steps, matrix_str);
+    this->matrix_->printMatrixOnFile(file_output_steps);
 }
 
 std::vector<Simplex::Fraction *> Simplex::Tableaux::getBVector() const

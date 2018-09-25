@@ -36,7 +36,7 @@ namespace Simplex {
     enum Operator {
         EQUAL           = 0,
         LESS_EQUAL      = 1,
-        GREATHER_EQUAL  = 2,
+        GREATER_EQUAL  = 2,
     };
 
     struct TableauxInput {
@@ -108,6 +108,8 @@ namespace Simplex {
         std::vector<std::array<long, 2>> getPivotedIndexes() const;
 
         void checkSolution();
+
+        long double getObjectiveValue() const;
 
         std::vector<Fraction *> getBVector() const;
 

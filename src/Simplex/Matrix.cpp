@@ -3,6 +3,7 @@
 //
 
 #include "Matrix.hpp"
+#include "File.hpp"
 
 Simplex::Matrix::Matrix(long m, long n, const std::vector<long long> &cells): m_(m), n_(n)
 {
@@ -105,6 +106,13 @@ std::string Simplex::Matrix::toString() const
     matrix_string += "]\n";
 
     return matrix_string;
+}
+
+void Simplex::Matrix::printMatrixOnFile(std::string file_output) const
+{
+    // Pivot finished. Write modifications on 'file_output_steps' file.
+    std::string matrix_str = toString();
+    Simplex::File::WriteOnFile(file_output, matrix_str);
 }
 
 long Simplex::Matrix::getM() const
