@@ -8,6 +8,8 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
 {
     matrix_ = std::make_unique<Matrix>(tableaux_input.m, tableaux_input.n, tableaux_input.cells);
 
+    std::cout << "Matrix:" << std::endl << matrix_->toString() << std::endl;
+
     this->convertToStandardForm(tableaux_input.is_non_negative);
 
     this->addSlackVariables(tableaux_input.operators);
@@ -18,7 +20,7 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
         matrix_->updateCell(0, j, new Fraction(element->getNumerator() * -1, element->getDenominator()));
     }
 
-    std::cout << "Tableaux:" << std::endl << matrix_->toString() << std::endl;
+    std::cout << "Tableaux after convertToStandardForm() and addSlackVariables():" << std::endl << matrix_->toString() << std::endl;
 }
 
 void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_negative)

@@ -51,11 +51,11 @@ namespace Simplex
 
         long double getFloatValue() const;
 
+        static long long gcd(const long long& a, const long long& b);
+
+        static long long gcm(const long long& a, const long long& b);
+
     private:
-
-        long long gcd(const long long& a, const long long& b) const;
-
-        long long gcm(const long long& a, const long long& b) const;
 
         void simplify();
 

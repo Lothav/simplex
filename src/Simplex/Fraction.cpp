@@ -101,12 +101,12 @@ long double Simplex::Fraction::getFloatValue() const
     return static_cast<long double>(this->numerator_) / static_cast<long double>(this->denominator_);
 }
 
-long long Simplex::Fraction::gcd(const long long& a, const long long& b) const
+long long Simplex::Fraction::gcd(const long long& a, const long long& b)
 {
     return b == 0 ? a : gcd(b, a % b);
 }
 
-long long Simplex::Fraction::gcm(const long long& a, const long long& b) const
+long long Simplex::Fraction::gcm(const long long& a, const long long& b)
 {
     return (a * b) / gcd(a, b);
 }

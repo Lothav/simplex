@@ -12,37 +12,7 @@
 #define SOLUTION_WRITE_FILE "conclusao.txt"
 #define STEP_WRITE_FILE "pivoteamento.txt"
 
-Simplex::TableauxInput interfaceComplete(int argc, char** argv)
-{
-    std::vector<std::string> file_data;
-    if (argc > 1) {
-        file_data = Simplex::File::GetFileData(argv[1]);
-    } else {
-        file_data = Simplex::File::GetStdInData();
-    }
-
-    if (!Simplex::File::checkFileComplete(file_data)) exit(EXIT_FAILURE);
-
-    auto type = Type::NON_INT;
-    int method_index = 0;
-
-    if (file_data.size() == 4) {
-        type = file_data[method_index++] == "0" ? Type::INT_CUTTING_PLANE : Type::INT_BRANCH_N_BOUND;
-    }
-
-    auto matrix_m       = std::stoi(file_data[method_index++]);
-    auto matrix_n       = std::stoi(file_data[method_index++]);
-    auto matrix_cells   = Simplex::File::GetIntsFromStringFile(std::move(file_data[method_index]));
-
-    return Simplex::TableauxInput{
-        .m      = matrix_m,
-        .n      = matrix_n,
-        .type   = type,
-        .cells  = matrix_cells,
-    };
-}
-
-Simplex::TableauxInput interfaceSimple(int argc, char** argv)
+Simplex::TableauxInput readFileData(int argc, char** argv)
 {
     std::vector<std::string> file_data = Simplex::File::GetFileData(argv[1]);
 
@@ -56,7 +26,15 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
     }
 
     std::vector<Simplex::Operator> operators = {};
-    std::vector<long long> cells = Simplex::File::GetIntsFromStringFile(std::move(file_data[3]));
+    auto obj_values = Simplex::File::GetSplitStringsFromStringFile(std::move(file_data[3]));
+
+    std::vector<double> cells;
+
+    // Set cells with objective function line
+    for (auto &obj_value: obj_values) {
+        auto value = std::strtod(obj_value.c_str(), nullptr);
+        cells.push_back(value);
+    }
     cells.push_back(0); // Initial Objective value
 
     for (int i = 0; i < restrictions_count; ++i) {
@@ -69,7 +47,9 @@ Simplex::TableauxInput interfaceSimple(int argc, char** argv)
             } else if (restriction_item == "=" || restriction_item == "==") {
                 operators.push_back(Simplex::Operator::EQUAL);
             } else {
-                cells.push_back(std::strtol(restriction_item.c_str(), nullptr, 10));
+
+                auto value = std::strtod(restriction_item.c_str(), nullptr);
+                cells.push_back(value);
             }
         }
     }
@@ -94,7 +74,7 @@ int main(int argc, char** argv)
 #ifdef INTERFACE_COMPLETE
             interfaceComplete(argc, argv)
 #else
-            interfaceSimple(argc, argv)
+            readFileData(argc, argv)
 #endif
         );
         tableaux->solve(STEP_WRITE_FILE);

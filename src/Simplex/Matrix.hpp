@@ -22,7 +22,7 @@ namespace Simplex
 
     public:
 
-        Matrix(long m, long n, const std::vector<long long>& cells);
+        Matrix(long m, long n, const std::vector<double>& cells);
 
         long getM() const;
 

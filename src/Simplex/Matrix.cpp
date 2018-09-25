@@ -2,16 +2,30 @@
 // Created by luiz0tavio on 5/5/18.
 //
 
+#include <cmath>
 #include "Matrix.hpp"
 #include "File.hpp"
 
-Simplex::Matrix::Matrix(long m, long n, const std::vector<long long> &cells): m_(m), n_(n)
+Simplex::Matrix::Matrix(long m, long n, const std::vector<double> &cells): m_(m), n_(n)
 {
     int i, j;
     for (i = 0 ; i < m_; i++) {
         cells_.push_back({});
         for (j = 0 ; j < n_; j++) {
-            cells_[i].push_back(new Fraction(cells[(i * n_) + j], 1));
+
+            auto value = cells[(i * n_) + j];
+
+            double integral = std::floor(value);
+            double frac = value - integral;
+
+            const long precision = 1000000000; // This is the accuracy.
+
+            long gcd_ = Simplex::Fraction::gcd(round(frac * precision), precision);
+
+            long denominator = precision / gcd_;
+            auto numerator = static_cast<long>(round(frac * precision) / gcd_);
+
+            cells_[i].push_back(new Fraction(static_cast<long long>((integral*denominator) + numerator), denominator));
         }
     }
 }

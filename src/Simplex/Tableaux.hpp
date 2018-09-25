@@ -51,7 +51,7 @@ namespace Simplex {
 
         // Tableaux cells.
         // Must contain objective function and restrictions.
-        const std::vector<long long> cells = {};
+        const std::vector<double> cells = {};
 
         // Operators vector size must be equal 'm'-1.
         // It's restrictions lines operators.
