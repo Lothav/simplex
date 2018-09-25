@@ -118,6 +118,16 @@ void Simplex::Tableaux::stepAux(std::string file_output_steps)
     File::WriteOnFile(file_output_steps, "Pivot Aux with Primal Algorithm:\n");
     while (stepPrimal(file_output_steps));
 
+    auto pivoted_indexes = getPivotedIndexes();
+
+    // Check if slack variable is on the solution base.
+    for(auto &pivoted_index: pivoted_indexes) {
+        if(pivoted_index[1] > this->matrix_->getN()-this->matrix_->getM()-2) {
+            this->solution_ = NON_VIABLE;
+            return;
+        }
+    }
+
     this->removeSlackVariables();
 }
 
@@ -148,22 +158,19 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
 
     // Check if objective value equal zero.
     auto objective_value = getObjectiveValue();
-    if (objective_value == 0) {
-
-        // Get pivoted indexes.
-        auto indexes = this->getPivotedIndexes();
+    if (objective_value == 0 && this->solution_ == NONE) {
 
         File::WriteOnFile(file_output_steps, "Solution found on Aux Matrix:\n");
         this->matrix_->printMatrixOnFile(file_output_steps);
 
-        // Recover matrix from backup.
-        for (int l = 0; l < this->matrix_->getM(); ++l) {
-            for (int i = 0; i < this->matrix_->getN(); ++i) {
-                this->matrix_->updateCell(l, i, backup_matrix[l][i]);
-            }
-        }
+        // Get pivoted indexes.
+        auto indexes = this->getPivotedIndexes();
 
-        File::WriteOnFile(file_output_steps, "Build original with Aux base:\n");
+        // Recover 'c' vector from backup.
+        for (int i = 0; i < this->matrix_->getN(); ++i) {
+            this->matrix_->updateCell(0, i, backup_matrix[0][i]);
+        }
+        File::WriteOnFile(file_output_steps, "Recover original 'c' vector. Using Aux base:\n");
         this->matrix_->printMatrixOnFile(file_output_steps);
 
         // Pivot found indexes.
