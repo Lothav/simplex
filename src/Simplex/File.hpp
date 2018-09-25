@@ -31,8 +31,6 @@ namespace Simplex
 
         static std::vector<std::string> GetSplitStringsFromStringFile(std::string&& data_string);
 
-        static bool checkFileComplete(const std::vector<std::string>& file_stream);
-
     private:
 
         static std::vector<std::string> readStream(std::istream& input_stream);

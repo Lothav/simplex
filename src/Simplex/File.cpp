@@ -60,33 +60,6 @@ std::vector<std::string> Simplex::File::GetSplitStringsFromStringFile(std::strin
     return result;
 }
 
-bool Simplex::File::checkFileComplete(const std::vector<std::string>& file_stream)
-{
-    // Check file lines.
-    bool valid = file_stream.size() == 3 || file_stream.size() == 4;
-
-    // Check if lines == 4, 'X' is eq 0 or 1.
-    valid = valid && (file_stream.size() != 4 || file_stream[0] == "0" || file_stream[0] == "1");
-
-    if (!valid) {
-        std::cerr << "Invalid file input!" << std::endl << std::endl;
-        std::cerr << "File must have 3 lines, as the format below, to solve using Primal/Dual methods:" << std::endl;
-        std::cerr << "\tm+1" << std::endl;
-        std::cerr << "\tn+1" << std::endl;
-        std::cerr << "\t[[line 0 ], [line 1], ..., [line n]]" << std::endl;
-        std::cerr << std::endl << std::endl;
-        std::cerr << "Or 4 lines, as the format below, to solve using Branch n' Bound/Cutting-plane methods:" << std::endl;
-        std::cerr << "\tX" << std::endl;
-        std::cerr << "\tm+1" << std::endl;
-        std::cerr << "\tn+1" << std::endl;
-        std::cerr << "\t[[line 0 ], [line 1], ..., [line n]]" << std::endl;
-        std::cerr << "Where 'X': " << std::endl;
-        std::cerr << "\t1 to solve using Branch n' Bound method" << std::endl;
-        std::cerr << "\t0 to solve using Cutting-plane method." << std::endl;
-    }
-
-    return valid;
-}
 
 std::vector<std::string> Simplex::File::readStream(std::istream& input_stream)
 {
