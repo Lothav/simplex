@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include "Data.hpp"
 
 namespace Simplex
 {
@@ -20,6 +21,10 @@ namespace Simplex
     public:
 
         File() = delete;
+
+        static TableauxInput GetTableauxInputFromFile(std::string&& file_path);
+
+        static void WriteSolution(const std::string& file_output_result, const TableauxOutput& output);
 
         static std::vector<std::string> GetFileData(std::string path);
 

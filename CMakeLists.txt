@@ -4,6 +4,7 @@ project (Simplex)
 
 add_executable (simplex
         src/main.cpp
+        src/Simplex/Data.hpp
         src/Simplex/File.cpp
         src/Simplex/File.hpp
         src/Simplex/Tableaux.cpp

@@ -4,13 +4,11 @@
 
 #include "Tableaux.hpp"
 
-Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(Solution::NONE), type_(tableaux_input.type)
+Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(SolutionType::NONE), type_(tableaux_input.type)
 {
     matrix_ = std::make_unique<Matrix>(tableaux_input.m, tableaux_input.n, tableaux_input.cells);
 
-    this->convertToStandardForm(tableaux_input.is_non_negative);
-
-    this->addSlackVariables(tableaux_input.operators);
+    this->convertToStandardForm(tableaux_input.is_non_negative, tableaux_input.operators);
 
     // Iterate in first matrix column. Set all elements to negative.
     for (int j = 0; j < matrix_->getN(); ++j) {
@@ -19,7 +17,7 @@ Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(Solv
     }
 }
 
-void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_negative)
+void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_negative, const std::vector<Operator>& operators)
 {
     auto matrix_cells = this->matrix_->getCells();
 
@@ -34,23 +32,20 @@ void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_ne
         }
     }
 
+    this->addSlackVariables(operators);
 }
 
-void Simplex::Tableaux::addSlackVariables(std::vector<Operator> operators)
+void Simplex::Tableaux::addSlackVariables(const std::vector<Operator>& operators)
 {
     // Insert [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]] vector like in matrix.
     // It corresponds to slack variables (before 'b' vector).
     // First line we will get our certifies.
 
-    while (operators.size() < this->matrix_->getM()) {
-        operators.push_back(Operator::LESS_EQUAL);
-    }
-
     // Iterate columns that must be add.
     for (int j = 0; j < this->matrix_->getM()-1; ++j) {
 
         // Equal operator doesn't need a slack variable.
-        if (operators[j] == Operator::EQUAL) {
+        if (!operators.empty() && operators[j] == Operator::EQUAL) {
             continue;
         }
 
@@ -65,7 +60,7 @@ void Simplex::Tableaux::addSlackVariables(std::vector<Operator> operators)
             if ((i != 0) && (i == j + 1)) {
                 slack_var_num = 1;
                 // Multiply all line by -1 so we have an canonical base.
-                if (operators[j] == Operator::GREATER_EQUAL) {
+                if (!operators.empty() && operators[j] == Operator::GREATER_EQUAL) {
                     for (int k = 0; k < this->matrix_->getN(); ++k) {
                         this->matrix_->updateCell(i, k, *matrix_->getCells()[i][k] * -1);
                     }
@@ -91,7 +86,7 @@ void Simplex::Tableaux::removeSlackVariables()
     }
 }
 
-void Simplex::Tableaux::stepAux(std::string file_output_steps)
+void Simplex::Tableaux::stepAux(const std::string& file_output_steps)
 {
     this->addSlackVariables({});
 
@@ -143,14 +138,13 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
         }
     }
 
-    // Save the matrix as backup.
+    // Get updated Matrix
     auto matrix_cells = this->matrix_->getCells();
-    std::vector<std::vector<Fraction*>> backup_matrix = {};
-    for (int l = 0; l < this->matrix_->getM(); ++l) {
-        backup_matrix.push_back({});
-        for (int i = 0; i < this->matrix_->getN(); ++i) {
-            backup_matrix[l].push_back(new Fraction(matrix_cells[l][i]->getNumerator(), matrix_cells[l][i]->getDenominator()));
-        }
+
+    // Save the 'c' vector as backup.
+    std::vector<Fraction*> backup_c_vec = {};
+    for (int i = 0; i < this->matrix_->getN(); ++i) {
+        backup_c_vec.push_back(new Fraction(matrix_cells[0][i]->getNumerator(), matrix_cells[0][i]->getDenominator()));
     }
 
     // Run aux matrix code.
@@ -160,7 +154,7 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
     auto objective_value = getObjectiveValue();
     if (objective_value == 0 && this->solution_ == NONE) {
 
-        File::WriteOnFile(file_output_steps, "Solution found on Aux Matrix:\n");
+        File::WriteOnFile(file_output_steps, "SolutionType found on Aux Matrix:\n");
         this->matrix_->printMatrixOnFile(file_output_steps);
 
         // Get pivoted indexes.
@@ -168,7 +162,7 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
 
         // Recover 'c' vector from backup.
         for (int i = 0; i < this->matrix_->getN(); ++i) {
-            this->matrix_->updateCell(0, i, backup_matrix[0][i]);
+            this->matrix_->updateCell(0, i, backup_c_vec[i]);
         }
         File::WriteOnFile(file_output_steps, "Recover original 'c' vector. Using Aux base:\n");
         this->matrix_->printMatrixOnFile(file_output_steps);
@@ -178,9 +172,11 @@ void Simplex::Tableaux::solveAux(std::string file_output_steps)
         for (auto index_ : indexes) {
             this->pivot(index_, file_output_steps);
         }
-    } else {
-        this->solution_ = Solution::NON_VIABLE;
+
+        return;
     }
+
+    this->solution_ = SolutionType::NON_VIABLE;
 }
 
 long double Simplex::Tableaux::getObjectiveValue() const
@@ -213,7 +209,7 @@ std::vector<std::array<long, 2>> Simplex::Tableaux::getPivotedIndexes() const
     return indexes;
 };
 
-SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
+Simplex::SolveMethod Simplex::Tableaux::getWhichSolveMethodApplies() const
 {
     auto matrix_cells = this->matrix_->getCells();
 
@@ -279,32 +275,15 @@ void Simplex::Tableaux::solve(std::string file_output_steps)
         while(stepPrimal(file_output_steps));
     }
 
-    if (this->solution_ == Solution::NONE) {
+    if (this->solution_ == SolutionType::NONE) {
         this->checkSolution();
     }
 }
 
-std::vector<Simplex::Fraction *> Simplex::Tableaux::getLine(long line_index) const
-{
-    auto matrix_cells = this->matrix_->getCells();
-
-    if (line_index > this->matrix_->getM()-1) {
-        throw std::invalid_argument("Invalid line_index in getALine() method!");
-    }
-
-    std::vector<Fraction *> line = {};
-
-    for (int i = 0; i < this->matrix_->getN(); ++i) {
-        line.push_back(matrix_cells[line_index][i]);
-    }
-
-    return line;
-}
-
 void Simplex::Tableaux::checkSolution()
 {
-    if (this->solution_ != Solution::NONE) {
-        std::cerr << "Solution already set!" << std::endl;
+    if (this->solution_ != SolutionType::NONE) {
+        std::cerr << "Calling checkSolution() but solution already set!" << std::endl;
         return;
     }
 
@@ -321,7 +300,7 @@ void Simplex::Tableaux::checkSolution()
         }
         if (check_all_negative) {
             if (*matrix_cells[0][i] < 0) {
-                this->solution_ = Solution::UNLIMITED;
+                this->solution_ = SolutionType::UNBOUNDED;
                 return;
             }
         }
@@ -330,7 +309,7 @@ void Simplex::Tableaux::checkSolution()
     // Check 'c' vector < 0.
     for (int i = 0; i < this->matrix_->getN()-1; ++i) {
         if (*matrix_cells[0][i] < 0) {
-            this->solution_ = Solution::NON_VIABLE;
+            this->solution_ = SolutionType::NON_VIABLE;
             return;
         }
     }
@@ -338,16 +317,16 @@ void Simplex::Tableaux::checkSolution()
     // Check 'b' vector < 0.
     for (int i = 1; i < this->matrix_->getM(); ++i) {
         if (*matrix_cells[i][this->matrix_->getN()-1] < 0) {
-            this->solution_ = Solution::NON_VIABLE;
+            this->solution_ = SolutionType::NON_VIABLE;
             return;
         }
     }
 
-    // Solution is viable.
-    this->solution_ = Solution::VIABLE;
+    // SolutionType is viable.
+    this->solution_ = SolutionType::VIABLE;
 }
 
-bool Simplex::Tableaux::stepPrimal(std::string file_output_steps)
+bool Simplex::Tableaux::stepPrimal(const std::string& file_output_steps)
 {
     // Try to get a Element index to Pivot.
     auto primal_indexes = this->getPrimalIndex();
@@ -362,7 +341,7 @@ bool Simplex::Tableaux::stepPrimal(std::string file_output_steps)
     return true;
 }
 
-bool Simplex::Tableaux::stepDual(std::string file_output_steps)
+bool Simplex::Tableaux::stepDual(const std::string& file_output_steps)
 {
     // Try to get a Element index to Pivot.
     auto dual_indexes = this->getDualIndex();
@@ -478,78 +457,52 @@ std::array<long, 2> Simplex::Tableaux::getDualIndex() const
     return index;
 }
 
-std::vector<long double> Simplex::Tableaux::getSolution() const
+Simplex::TableauxOutput Simplex::Tableaux::getOutput() const
 {
-    std::vector<long double> solution = {};
-    auto indexes = this->getPivotedIndexes();
+    TableauxOutput output = {};
+
+    output.solution_type = this->solution_;
 
     auto matrix_cells = this->matrix_->getCells();
-
-    for (int l = 0; l < this->matrix_->getN()-this->matrix_->getM(); ++l) {
-        bool found = false;
-        for(auto index: indexes) {
-            if (index[1] == l) {
-                solution.push_back(matrix_cells[index[0]][this->matrix_->getN()-1]->getFloatValue());
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            solution.push_back(0.0f);
-        }
-    }
-
-    return solution;
-}
-
-void Simplex::Tableaux::writeSolution(std::string file_output_result) const
-{
-    if (this->solution_ == Solution::NONE) {
-        std::cerr << "Solution not set!" << std::endl;
-        return;
-    }
-
-    // Clear output file.
-    std::ofstream ofs;
-    ofs.open(file_output_result, std::ofstream::out | std::ofstream::trunc);
-    ofs.close();
-
-    auto matrix_cells = this->matrix_->getCells();
-    auto objective_value = matrix_cells[0][this->matrix_->getN()-1];
 
     // Found a optimal solution.
-    if (this->solution_ == Solution::VIABLE) {
+    if (this->solution_ == SolutionType::VIABLE) {
 
-        auto solution = this->getSolution();
+        std::vector<long double> solution = {};
+        auto indexes = this->getPivotedIndexes();
 
-        std::string solution_str = "[";
-        for (int k = 0; k < solution.size(); ++k) {
-            solution_str += std::to_string(solution[k]) + (k != solution.size()-1 ? ", " : "");
+        for (int l = 0; l < this->matrix_->getN()-this->matrix_->getM(); ++l) {
+            bool found = false;
+            for(auto index: indexes) {
+                if (index[1] == l) {
+                    solution.push_back(matrix_cells[index[0]][this->matrix_->getN()-1]->getFloatValue());
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                solution.push_back(0.0f);
+            }
         }
-        solution_str += "]";
 
-        File::WriteOnFile(file_output_result, "2");
-        File::WriteOnFile(file_output_result, solution_str);
-        File::WriteOnFile(file_output_result, std::to_string(objective_value->getFloatValue()));
+        output.solution = solution;
+        output.objective_value = matrix_cells[0][this->matrix_->getN()-1]->getFloatValue();
+
+        return output;
     }
 
     // Non-viable tableaux.
-    if (this->solution_ == Solution::NON_VIABLE) {
-        File::WriteOnFile(file_output_result, "0");
+    if (this->solution_ == SolutionType::NON_VIABLE) {
+        return output;
     }
 
     // Unlimited tableaux.
-    if (this->solution_ == Solution::UNLIMITED) {
-        File::WriteOnFile(file_output_result, "1");
+    if (this->solution_ == SolutionType::UNBOUNDED) {
+        return output;
     }
 
-    std::string certify_str = "[";
-    for (long k = this->matrix_->getN()-this->matrix_->getM(); k < this->matrix_->getN()-1; ++k) {
-        certify_str += std::to_string(matrix_cells[0][k]->getFloatValue()) + (k != this->matrix_->getN()-2 ? ", " : "");
-    }
-    certify_str += "]";
-
-    File::WriteOnFile(file_output_result, certify_str);
+    std::cerr << "SolutionType not set! There's something wrong." << std::endl;
+    return output;
 }
 
 void Simplex::Tableaux::pivot(const std::array<long, 2>& indexes, std::string file_output_steps)
@@ -598,32 +551,4 @@ void Simplex::Tableaux::pivot(const std::array<long, 2>& indexes, std::string fi
     }
 
     this->matrix_->printMatrixOnFile(file_output_steps);
-}
-
-std::vector<Simplex::Fraction *> Simplex::Tableaux::getBVector() const
-{
-    std::vector<Fraction *> b_vec;
-
-    long b_column = this->matrix_->getN()-1;
-    auto matrix_cells = this->matrix_->getCells();
-
-    for (int i = 1; i < this->matrix_->getM(); ++i) {
-        b_vec.push_back(matrix_cells[i][b_column]);
-    }
-
-    return b_vec;
-}
-
-std::array<long, 2> Simplex::Tableaux::getBFirstFloatIndex() const
-{
-    auto b_vector = this->getBVector();
-    long b_column = this->matrix_->getN()-1;
-
-    for (int i = 0; i < b_vector.size(); i++) {
-        if (b_vector[i]->getDenominator() != 1) {
-            return {i + 1, b_column};
-        }
-    }
-
-    return EMPTY_INDEXES;
 }
