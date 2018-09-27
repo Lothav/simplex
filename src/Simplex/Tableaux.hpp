@@ -5,11 +5,8 @@
 #ifndef SIMPLEX_TABLEAUX_HPP
 #define SIMPLEX_TABLEAUX_HPP
 
-#include <array>
-#include <cmath>
 #include "Matrix.hpp"
 #include "File.hpp"
-
 
 const std::array<long, 2> EMPTY_INDEXES = {-1, -1};
 

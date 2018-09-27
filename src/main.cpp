@@ -2,11 +2,6 @@
 // Created by luiz0tavio on 5/5/18.
 //
 
-#include <iostream>
-#include <fstream>
-#include <cstring>
-#include <vector>
-#include <climits>
 #include "Simplex/Tableaux.hpp"
 
 #define STEPS_WRITE_FILE "steps.txt"

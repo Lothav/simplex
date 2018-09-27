@@ -5,9 +5,9 @@
 #ifndef SIMPLEX_MATRIX_HPP
 #define SIMPLEX_MATRIX_HPP
 
-#include "Fraction.hpp"
 #include <vector>
 #include <iostream>
+#include "Fraction.hpp"
 
 namespace Simplex
 {
