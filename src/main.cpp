@@ -27,7 +27,7 @@ int main(int argc, char** argv)
         Simplex::File::WriteSolution(output_file, solution);
     }
     const clock_t end_time = std::clock();
-    auto time_spent = static_cast<float>( end_time - begin_time) / CLOCKS_PER_SEC;
+    auto time_spent = static_cast<float>(end_time - begin_time) / CLOCKS_PER_SEC;
     std::cout << "Finished. Took " << time_spent << "s." << std::endl;
     std::cout << "\tThe results was written in '" << output_file << "'." << std::endl;
     std::cout << "\tMatrix steps was written in '" << STEPS_WRITE_FILE << "'." << std::endl;

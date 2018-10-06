@@ -1,7 +1,3 @@
-//
-// Created by tracksale on 5/7/18.
-//
-
 #include <cmath>
 #include <stdexcept>
 #include <iostream>

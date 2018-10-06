@@ -10,9 +10,8 @@
 
 const std::array<long, 2> EMPTY_INDEXES = {-1, -1};
 
-namespace Simplex {
-
-
+namespace Simplex
+{
     class Tableaux
     {
 
@@ -62,6 +61,5 @@ namespace Simplex {
         long double getObjectiveValue() const;
 
     };
-
 }
 #endif //SIMPLEX_TABLEAUX_HPP
