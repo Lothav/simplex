@@ -103,7 +103,6 @@ Simplex::TableauxInput Simplex::File::GetTableauxInputFromFile(std::string&& fil
             } else if (restriction_item == "=" || restriction_item == "==") {
                 operators.push_back(Simplex::Operator::EQUAL);
             } else {
-
                 auto value = std::strtod(restriction_item.c_str(), nullptr);
                 cells.push_back(value);
             }

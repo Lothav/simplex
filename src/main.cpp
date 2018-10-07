@@ -20,7 +20,8 @@ int main(int argc, char** argv)
     // Tableaux Unique_Ptr scope.
     {
         // Generate matrix from input file.
-        auto tableaux = std::make_unique<Simplex::Tableaux>(Simplex::File::GetTableauxInputFromFile(std::move(input_file)));
+        auto tableaux_input = Simplex::File::GetTableauxInputFromFile(std::move(input_file));
+        auto tableaux = std::make_unique<Simplex::Tableaux>(std::move(tableaux_input));
         tableaux->solve(STEPS_WRITE_FILE);
 
         auto solution = tableaux->getOutput();

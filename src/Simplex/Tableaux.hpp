@@ -17,10 +17,11 @@ namespace Simplex
 
     private:
 
-        Type                    type_;
-        SolveMethod             solve_method_;
-        std::unique_ptr<Matrix> matrix_;
+        Type                        type_;
+        SolveMethod                 solve_method_;
+        std::unique_ptr<Matrix>     matrix_;
         SolutionType                solution_;
+        uint                        count_slack;
 
     public:
 
