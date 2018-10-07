@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/5/18.
-//
-
 #include "Simplex/Tableaux.hpp"
 
 #define STEPS_WRITE_FILE "steps.txt"

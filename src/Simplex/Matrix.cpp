@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/5/18.
-//
-
 #include <cmath>
 #include "Matrix.hpp"
 #include "File.hpp"

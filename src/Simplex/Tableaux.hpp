@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/5/18.
-//
-
 #ifndef SIMPLEX_TABLEAUX_HPP
 #define SIMPLEX_TABLEAUX_HPP
 

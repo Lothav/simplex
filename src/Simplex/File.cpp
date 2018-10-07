@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/7/18.
-//
-
 #include "File.hpp"
 
 std::vector<std::string> Simplex::File::GetFileData(std::string path)
