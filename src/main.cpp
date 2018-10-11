@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/5/18.
-//
-
 #include "Simplex/Tableaux.hpp"
 
 #define STEPS_WRITE_FILE "steps.txt"
@@ -20,14 +16,15 @@ int main(int argc, char** argv)
     // Tableaux Unique_Ptr scope.
     {
         // Generate matrix from input file.
-        auto tableaux = std::make_unique<Simplex::Tableaux>(Simplex::File::GetTableauxInputFromFile(std::move(input_file)));
+        auto tableaux_input = Simplex::File::GetTableauxInputFromFile(std::move(input_file));
+        auto tableaux = std::make_unique<Simplex::Tableaux>(std::move(tableaux_input));
         tableaux->solve(STEPS_WRITE_FILE);
 
         auto solution = tableaux->getOutput();
         Simplex::File::WriteSolution(output_file, solution);
     }
     const clock_t end_time = std::clock();
-    auto time_spent = static_cast<float>( end_time - begin_time) / CLOCKS_PER_SEC;
+    auto time_spent = static_cast<float>(end_time - begin_time) / CLOCKS_PER_SEC;
     std::cout << "Finished. Took " << time_spent << "s." << std::endl;
     std::cout << "\tThe results was written in '" << output_file << "'." << std::endl;
     std::cout << "\tMatrix steps was written in '" << STEPS_WRITE_FILE << "'." << std::endl;

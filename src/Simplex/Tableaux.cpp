@@ -1,10 +1,6 @@
-//
-// Created by luiz0tavio on 5/5/18.
-//
-
 #include "Tableaux.hpp"
 
-Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(SolutionType::NONE), type_(tableaux_input.type)
+Simplex::Tableaux::Tableaux(TableauxInput&& tableaux_input) : solve_method_(SolveMethod::PRIMAL_METHOD), solution_(SolutionType::NONE), type_(tableaux_input.type), count_slack(0)
 {
     matrix_ = std::make_unique<Matrix>(tableaux_input.m, tableaux_input.n, tableaux_input.cells);
 
@@ -37,7 +33,6 @@ void Simplex::Tableaux::convertToStandardForm(const std::vector<bool>& is_non_ne
 
 void Simplex::Tableaux::addSlackVariables(const std::vector<Operator>& operators)
 {
-    // Insert [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]] vector like in matrix.
     // It corresponds to slack variables (before 'b' vector).
     // First line we will get our certifies.
 
@@ -76,14 +71,17 @@ void Simplex::Tableaux::addSlackVariables(const std::vector<Operator>& operators
 
         // Insert it straight before 'b' element.
         this->matrix_->addColumn(this->matrix_->getN()-1, column);
+        count_slack++;
     }
 }
 
 void Simplex::Tableaux::removeSlackVariables()
 {
-    for (int j = 0; j < this->matrix_->getM()-1; ++j) {
+    for (int j = 0; j < count_slack; ++j) {
         this->matrix_->removeColumn(this->matrix_->getN()-2);
     }
+
+    count_slack = 0;
 }
 
 void Simplex::Tableaux::stepAux(const std::string& file_output_steps)
@@ -191,7 +189,7 @@ std::vector<std::array<long, 2>> Simplex::Tableaux::getPivotedIndexes() const
 
     auto matrix_cells = this->matrix_->getCells();
 
-    for (int j = 0; j < this->matrix_->getN()-1; ++j) {
+    for (int j = 0; j < this->matrix_->getN()-1-count_slack; ++j) {
         int count_zeros = 0;
         index = EMPTY_INDEXES;
         for (int i = 0; i < this->matrix_->getM(); ++i) {
@@ -471,10 +469,11 @@ Simplex::TableauxOutput Simplex::Tableaux::getOutput() const
         std::vector<long double> solution = {};
         auto indexes = this->getPivotedIndexes();
 
-        for (int l = 0; l < this->matrix_->getN()-this->matrix_->getM(); ++l) {
+        for (int l = 0; l < this->matrix_->getN()-1-count_slack; ++l) {
             bool found = false;
             for(auto index: indexes) {
                 if (index[1] == l) {
+                    // Push 'b' element to solution vector.
                     solution.push_back(matrix_cells[index[0]][this->matrix_->getN()-1]->getFloatValue());
                     found = true;
                     break;

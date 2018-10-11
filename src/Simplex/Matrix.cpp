@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/5/18.
-//
-
 #include <cmath>
 #include "Matrix.hpp"
 #include "File.hpp"
@@ -18,7 +14,7 @@ Simplex::Matrix::Matrix(long m, long n, const std::vector<double> &cells): m_(m)
             double integral = std::floor(value);
             double frac = value - integral;
 
-            const long precision = 1000000000; // This is the accuracy.
+            const long precision = 1000000000;
 
             long gcd_ = Simplex::Fraction::gcd(round(frac * precision), precision);
 

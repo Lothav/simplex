@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/7/18.
-//
-
 #ifndef SIMPLEX_FILE_HPP
 #define SIMPLEX_FILE_HPP
 
@@ -31,8 +27,6 @@ namespace Simplex
         static std::vector<std::string> GetStdInData();
 
         static void WriteOnFile(std::string path, std::string data);
-
-        static std::vector<long long> GetIntsFromStringFile(std::string&& data_string);
 
         static std::vector<std::string> GetSplitStringsFromStringFile(std::string&& data_string);
 

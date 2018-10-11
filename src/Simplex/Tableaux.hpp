@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/5/18.
-//
-
 #ifndef SIMPLEX_TABLEAUX_HPP
 #define SIMPLEX_TABLEAUX_HPP
 
@@ -10,18 +6,18 @@
 
 const std::array<long, 2> EMPTY_INDEXES = {-1, -1};
 
-namespace Simplex {
-
-
+namespace Simplex
+{
     class Tableaux
     {
 
     private:
 
-        Type                    type_;
-        SolveMethod             solve_method_;
-        std::unique_ptr<Matrix> matrix_;
+        Type                        type_;
+        SolveMethod                 solve_method_;
+        std::unique_ptr<Matrix>     matrix_;
         SolutionType                solution_;
+        uint                        count_slack;
 
     public:
 
@@ -62,6 +58,5 @@ namespace Simplex {
         long double getObjectiveValue() const;
 
     };
-
 }
 #endif //SIMPLEX_TABLEAUX_HPP

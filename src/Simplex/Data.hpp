@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 9/27/18.
-//
-
 #ifndef SIMPLEX_DATA_HPP
 #define SIMPLEX_DATA_HPP
 

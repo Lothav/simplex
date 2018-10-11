@@ -1,7 +1,3 @@
-//
-// Created by luiz0tavio on 5/7/18.
-//
-
 #include "File.hpp"
 
 std::vector<std::string> Simplex::File::GetFileData(std::string path)
@@ -32,21 +28,6 @@ void Simplex::File::WriteOnFile(std::string path, std::string data)
     out_file.open(path, std::ios::app);
     out_file << data << "\n";
     out_file.close();
-}
-
-std::vector<long long> Simplex::File::GetIntsFromStringFile(std::string&& data_string)
-{
-    std::vector<long long> data_int = {};
-
-    std::regex r("(\\+|-)?[[:digit:]]+");
-    std::smatch m;
-
-    while (std::regex_search(data_string, m, r)) {
-        data_int.push_back( std::stoi (m[0]) );
-        data_string = m.suffix().str();
-    }
-
-    return data_int;
 }
 
 std::vector<std::string> Simplex::File::GetSplitStringsFromStringFile(std::string&& data_string)
@@ -82,10 +63,10 @@ Simplex::TableauxInput Simplex::File::GetTableauxInputFromFile(std::string&& fil
     auto variables_count    = std::stoi(file_data[0]);
     auto restrictions_count = std::stoi(file_data[1]);
 
-    auto non_negative = Simplex::File::GetIntsFromStringFile(std::move(file_data[2]));
+    auto non_negative = Simplex::File::GetSplitStringsFromStringFile(std::move(file_data[2]));
     std::vector<bool> is_non_negative = {};
-    for (auto non_negative_i : non_negative) {
-        is_non_negative.push_back(non_negative_i == 1);
+    for (auto &non_negative_i : non_negative) {
+        is_non_negative.push_back(std::atoi(non_negative_i.c_str()) == 1);
     }
 
     std::vector<Simplex::Operator> operators = {};
@@ -118,7 +99,6 @@ Simplex::TableauxInput Simplex::File::GetTableauxInputFromFile(std::string&& fil
             } else if (restriction_item == "=" || restriction_item == "==") {
                 operators.push_back(Simplex::Operator::EQUAL);
             } else {
-
                 auto value = std::strtod(restriction_item.c_str(), nullptr);
                 cells.push_back(value);
             }
@@ -173,13 +153,13 @@ void Simplex::File::WriteSolution(const std::string& file_output_result, const T
 
         case SolutionType::NON_VIABLE:
             output_str  = "Status: inviavel\n";
-            output_str += "\nCertificado:";
+            output_str += "Certificado:";
             output_str += "\n";
             break;
 
         case SolutionType::UNBOUNDED:
             output_str  = "Status: inviavel\n";
-            output_str += "\nCertificado:";
+            output_str += "Certificado:";
             output_str += "\n";
             break;
 
