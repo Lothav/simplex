@@ -13,4 +13,4 @@ add_executable (simplex
         src/Simplex/Matrix.hpp
         src/Simplex/Fraction.cpp
         src/Simplex/Fraction.hpp
-        )
+)
